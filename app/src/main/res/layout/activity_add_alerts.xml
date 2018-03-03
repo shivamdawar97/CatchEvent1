@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="dawar.catchevent.AddAlerts">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        android:id="@+id/appBarLayout">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <TextView
+        android:id="@+id/alert_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/appBarLayout"
+        android:layout_marginLeft="10dp"
+        android:layout_weight="1"
+        android:text="Title:"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
+        android:textSize="16sp" />
+
+    <EditText
+        android:id="@+id/edit_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/alert_title"
+        android:ems="10"
+        android:inputType="textPersonName" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/alert_title"
+        android:layout_below="@+id/edit_title"
+        android:layout_weight="1"
+        android:text="Description:"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
+        android:textSize="16sp" />
+
+    <EditText
+        android:id="@+id/edit_desc"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textView3"
+        android:enabled="true"
+        android:gravity="top|left"
+        android:focusable="true"
+        android:inputType="textMultiLine"
+        android:isScrollContainer="true"
+        android:maxLines="10"
+        android:minLines="1"
+        android:ems="10"
+        />
+
+    <TextView
+        android:id="@+id/related_event"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/textView3"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
+        android:textSize="16sp"
+        android:layout_below="@+id/edit_desc"
+        android:text="Related to the Event:" />
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="0dp"
+        android:layout_alignParentStart="true"
+        android:text="Update Alert Now"
+        android:onClick="updateAlert"/>
+
+
+</RelativeLayout>

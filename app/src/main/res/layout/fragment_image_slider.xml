@@ -1,0 +1,40 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="dawar.catchevent.Image_slider">
+    <android.support.v4.view.ViewPager
+        android:id="@+id/gal_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/common_google_signin_btn_text_light_default" >
+
+    </android.support.v4.view.ViewPager>
+
+    <TextView
+        android:id="@+id/lbl_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:text="TextView"
+        android:textColor="@color/cardview_light_background"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/idate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="100dp"
+        android:layout_marginLeft="30dp"
+        android:backgroundTint="@color/common_google_signin_btn_text_light_default"
+        android:text="Date"
+        android:textColor="@color/cardview_light_background"
+        android:textSize="20sp" />
+
+
+
+</RelativeLayout>

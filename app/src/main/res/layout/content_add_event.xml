@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="dawar.catchevent.AddEvent"
+    tools:showIn="@layout/activity_add_event">
+
+
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="34dp"
+        android:onClick="createEvent"
+        android:text="@string/create_event"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scrollView"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/button2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.393"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/add_event_image"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:onClick="showFileChooser"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/ic_launcher_background" />
+
+            <EditText
+                android:id="@+id/edit_ename"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:hint="@string/enter_event_name"
+                android:inputType="textPersonName" />
+
+            <EditText
+                android:id="@+id/event_date"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:hint="@string/date_of_event_dd_mm_yy"
+                android:inputType="date" />
+
+            <EditText
+                android:id="@+id/event_timings"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:hint="@string/timings_hh_mm_am_pm"
+                android:inputType="time" />
+
+            <EditText
+                android:id="@+id/event_venue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="Venue"
+                android:inputType="textPersonName" />
+
+
+            <EditText
+                android:id="@+id/reg_fee"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:hint="Registration Fee(if any)"
+                android:inputType="number" />
+
+            <EditText
+                android:id="@+id/fst_prize"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:hint="1st Prize(if any)"
+                android:inputType="number" />
+
+            <EditText
+                android:id="@+id/snd_prize"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:hint="2nd Prize(if any)"
+                android:inputType="number" />
+
+            <EditText
+                android:id="@+id/thrd_prize"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:hint="3rd Prize(if any)"
+                android:inputType="number" />
+            <EditText
+                android:id="@+id/event_desc"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:enabled="true"
+                android:focusable="true"
+                android:gravity="top|left"
+                android:hint="@string/det_description_about_event"
+                android:inputType="textMultiLine"
+                android:maxLines="15"
+                android:minLines="1"
+                android:overScrollMode="always"
+                android:scrollbarStyle="insideInset"
+                android:scrollbars="vertical"
+                android:isScrollContainer="true"
+                android:nestedScrollingEnabled="true"/>
+        </LinearLayout>
+    </ScrollView>
+</android.support.constraint.ConstraintLayout>

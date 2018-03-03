@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">CatchEvent</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_add_event">AddEvent</string>
+    <string name="event_emage_appear_here">Event Emage Appear here</string>
+    <string name="enter_event_name">Enter Event Name</string>
+    <string name="date_of_event_dd_mm_yy">Date of Event (dd/mm/yy)</string>
+    <string name="timings_hh_mm_am_pm">Timings (hh:mm 24h format)</string>
+    <string name="det_description_about_event">Detailed Description About Event</string>
+    <string name="create_event">Create Event</string>
+    <string name="security_txt">If You does\'t have Security Key Contact to officials to get authorised</string>
+    <string name="title_activity_event_detail">EventDetail</string>
+    <string name="event_image">Event Image</string>
+    <string name="summry">Details</string>
+    <string name="title_activity_log_in">LogIn</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_list">ListActivity</string>
+    <string name="title_activity_add_alerts">AddAlerts</string>
+</resources>

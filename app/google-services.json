@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "716498003025",
+    "firebase_url": "https://catchevent-45f44.firebaseio.com",
+    "project_id": "catchevent-45f44",
+    "storage_bucket": "catchevent-45f44.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:716498003025:android:47c5fec85c257d0d",
+        "android_client_info": {
+          "package_name": "dawar.catchevent"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "716498003025-gnejcrcfpnvlpjm9p26hqsvsm43h9rjr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "dawar.catchevent",
+            "certificate_hash": "b414874fc6fd08e3c522bcca7f117b5a702b0c65"
+          }
+        },
+        {
+          "client_id": "716498003025-bovuc5l61idu5bbtovfs8seu09k8e6rt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAz96NdxMNVxDqwwGObduLl0WcFGuA-BU8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "716498003025-bovuc5l61idu5bbtovfs8seu09k8e6rt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
