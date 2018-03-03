@@ -198,8 +198,6 @@ public class MainActivity extends AppCompatActivity
 
         if(id == R.id.action_login){
                 cA.signIn();
-                finish();
-                startActivity(getIntent());
             return true;
         }
         if(id==R.id.action_logout){
@@ -235,6 +233,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
+        Intent intent;
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
@@ -242,20 +241,25 @@ public class MainActivity extends AppCompatActivity
 
 
         } else if (id == R.id.nav_gallery) {
-        Intent intent=new Intent(this,GalleryActivity.class);
+
+        intent=new Intent(this,GalleryActivity.class);
         intent.putExtra("view",3);
         intent.putExtra("name","Gallery");
         startActivity(intent);
 
         } else if (id == R.id.nav_Alerts) {
 
-
+            intent=new Intent(this,GalleryActivity.class);
+            intent.putExtra("view",4);
+            intent.putExtra("name","Alerts");
+            startActivity(intent);
 
         }  else if (id == R.id.nav_aboutus) {
 
 
 
         } else if (id == R.id.nav_send_feedback) {
+
 
         }
 

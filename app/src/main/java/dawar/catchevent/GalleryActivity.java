@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -113,6 +114,8 @@ public class GalleryActivity extends AppCompatActivity {
         });
 
         if(t==1){
+            //For Gallery of an particular a particular Event
+            ftb.setVisibility(View.VISIBLE);
             keyID=getIntent().getStringExtra("key");
         mdata.child("Events").child(keyID).child("Gallery").addChildEventListener(new ChildEventListener() {
 
@@ -158,14 +161,26 @@ public class GalleryActivity extends AppCompatActivity {
             }
         });
         }
-        else  if(t==2){
+        else  if(t==2 || t==4){
             ftb.setVisibility(View.GONE);
-            keyID=getIntent().getStringExtra("key");
-            mdata.child("Events").child(keyID).child("Alerts").addChildEventListener(new ChildEventListener() {
+            if(t==2) {
+                //Get Alerts for a particular Event
+                //Else: Alerts of all Events
+                keyID = getIntent().getStringExtra("key");
+                mdata=mdata.child("Events").child(keyID);
+            }
+            mdata.child("Alerts").addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                   s=dataSnapshot.getValue().toString();
+                 if(t==2) {
+                     s = dataSnapshot.getValue().toString();
+                     images.add(0, s);
+                 }
+                 else
+                 {
+                    s=dataSnapshot.getKey();
                     images.add(0,s);
+                 }
 
                 }
 
@@ -191,7 +206,8 @@ public class GalleryActivity extends AppCompatActivity {
             });
         }
         else {
-            ftb.setVisibility(View.GONE);
+            //For all Gallery Images
+            ftb.setVisibility(View.INVISIBLE);
             mdata.child("Gallery").addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -230,6 +246,7 @@ public class GalleryActivity extends AppCompatActivity {
 
 
         if(t==1 || t==3) {
+            //Update rescycler View with images for a particular Event or for all
             imagerecycler.setAdapter(new RecyclerView.Adapter<RecyclerViewHolder>() {
                 @Override
                 public RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -276,27 +293,29 @@ public class GalleryActivity extends AppCompatActivity {
 
                 @Override
                 public void onBindViewHolder(final RecyclerViewHolder holder, final int position) {
-                    mdata.child("Alerts").child(images.get(position)).addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
+                    mdata=FirebaseDatabase.getInstance().getReference().child("Alerts");
+                        mdata.child(images.get(position)).addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                            String s1=(position+1)+". "+dataSnapshot.child("title").getValue().toString()+
-                                    "\n Event:"+dataSnapshot.child("ename").getValue().toString();
-                           String s2=dataSnapshot.child("date").getValue().toString();
-                            holder.setAlert(s1,s2);
-                            holder.mview.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
+                                String s1 = "<font color='#bf4080'> " + dataSnapshot.child("title").getValue().toString() +
+                                        "</font><br/> Event:" + dataSnapshot.child("ename").getValue().toString();
+                                String s2 = dataSnapshot.child("date").getValue().toString();
+                                holder.setAlert(s1, s2);
+                                holder.mview.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
 
-                                }
-                            });
-                        }
+                                    }
+                                });
+                            }
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
 
-                        }
-                    });
+                            }
+                        });
+
 
                 }
 
@@ -388,10 +407,9 @@ public class GalleryActivity extends AppCompatActivity {
         }
         public void setAlert(String s1,String s2){
             TextView title=mview.findViewById(R.id.alert_title2);
-            title.setText(s1);
+            title.setText(Html.fromHtml(s1));
             title=mview.findViewById(R.id.alert_date);
             title.setText(s2);
-
         }
 
     }
