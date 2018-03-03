@@ -351,15 +351,24 @@ public class GalleryActivity extends AppCompatActivity {
                 options.inPreferredConfig = Bitmap.Config.ARGB_8888;
                 compress = BitmapFactory.decodeFile(imagePath,options);
                 cursor.close();
-*/
-
                 try {
-                    compress=MediaStore.Images.Media.getBitmap( getContentResolver(),filepathuri);
+                    compress=new Compressor(GalleryActivity.this)
+                            .setCompressFormat(Bitmap.CompressFormat.WEBP)
+                            .setMaxHeight(200)
+                            .setMaxWidth(100)
+                            .setQuality(60)
+                            .compressToBitmap(new File(filepathuri.getPath()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                */
+                try {
+                    compress= MediaStore.Images.Media.getBitmap( getContentResolver(),filepathuri);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                compress.compress(Bitmap.CompressFormat.JPEG, 0, baos);
+                compress.compress(Bitmap.CompressFormat.JPEG, 60, baos);
 
                 byte[] data1 = baos.toByteArray();
 
