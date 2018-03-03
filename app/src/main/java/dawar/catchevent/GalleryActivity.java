@@ -1,16 +1,20 @@
 package dawar.catchevent;
 
+import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.Image;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -57,6 +61,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.text.AttributedCharacterIterator;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -69,7 +74,7 @@ public class GalleryActivity extends AppCompatActivity {
 
 
     private FloatingTextButton ftb;
-    private Uri filepath;
+    private Uri filepathuri;
     StorageReference mstore;
     String keyID;
     CommonAdapter ca;
@@ -334,19 +339,32 @@ public class GalleryActivity extends AppCompatActivity {
                 mDialog.setTitle("Uploading");
                 mDialog.setMessage("Please Wait!");
                 mDialog.show();
-                filepath = data.getData();
-                File newCompressed=new File(filepath.getPath());
+                filepathuri = data.getData();
+
+
+/*
+                String[] filePath = { MediaStore.Images.Media.DATA };
+                Cursor cursor = getContentResolver().query(filepathuri, filePath, null, null, null);
+                cursor.moveToFirst();
+                String imagePath = cursor.getString(cursor.getColumnIndex(filePath[0]));
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                compress = BitmapFactory.decodeFile(imagePath,options);
+                cursor.close();
+*/
+
                 try {
-                    compress = new Compressor(GalleryActivity.this).compressToBitmap(newCompressed);
+                    compress=MediaStore.Images.Media.getBitmap( getContentResolver(),filepathuri);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                compress.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                compress.compress(Bitmap.CompressFormat.JPEG, 0, baos);
+
                 byte[] data1 = baos.toByteArray();
 
-                riversRef=mstore.child("images").child(keyID);
-                riversRef = riversRef.child(filepath.getLastPathSegment());
+                riversRef=mstore.child("images").child(getIntent().getStringExtra("name"));
+                riversRef = riversRef.child(filepathuri.getLastPathSegment());
                 riversRef.putBytes(data1).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -405,9 +423,11 @@ public class GalleryActivity extends AppCompatActivity {
            // im.setImageBitmap(img);
 
         }
-        public void setAlert(String s1,String s2){
+
+        public void setAlert(String s1, String s2){
             TextView title=mview.findViewById(R.id.alert_title2);
             title.setText(Html.fromHtml(s1));
+            //title.setCompoundDrawablesWithIntrinsicBounds(R.drawable.googleg_standard_color_18,0,0,0);
             title=mview.findViewById(R.id.alert_date);
             title.setText(s2);
         }

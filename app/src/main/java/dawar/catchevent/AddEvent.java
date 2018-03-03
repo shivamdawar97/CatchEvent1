@@ -46,7 +46,6 @@ public class AddEvent extends AppCompatActivity {
     private ProgressDialog pd;
     DatabaseReference mDatabaseRef;
 
-    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -9,6 +9,7 @@
     android:layout_height="wrap_content"
     android:background="@color/bgname"
     android:orientation="vertical">
+
     <TextView
         android:id="@+id/alert_title2"
         android:layout_width="match_parent"
