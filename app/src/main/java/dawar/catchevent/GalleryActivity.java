@@ -285,7 +285,7 @@ public class GalleryActivity extends AppCompatActivity {
                 }
             });
 
-            imagerecycler.setLayoutManager(new GridLayoutManager(GalleryActivity.this, 2));
+            imagerecycler.setLayoutManager(new GridLayoutManager(GalleryActivity.this, 1));
         }
         else  {
 
