@@ -32,7 +32,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
  */
 
 public  class CommonAdapter  {
-    private static int  RC_SIGN_IN = 1;
+    private static int  RC_SIGN_IN = 10;
     private String name;
     private String image;
     private String gimage;

@@ -5,6 +5,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -32,6 +33,7 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 
 import android.widget.AbsListView;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import android.widget.TextView;
@@ -244,17 +246,56 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_camera) {
             // Handle the camera action
-            if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.M){
-                if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED)
-                {
-                    //Permission Denied
-                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
+            AlertDialog.Builder ab=new AlertDialog.Builder(MainActivity.this);
+            ab.setTitle("Choose Image Source:");
+            ab.setPositiveButton("CAMERA", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                    if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA)!= PackageManager.PERMISSION_GRANTED)
+                    {
+                        //Permission Denied
+                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CAMERA},2);
+                    }
+                    else {
+                        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                        startActivityForResult(cameraIntent, 9);
+
+                    }
 
                 }
-                else {
+            });
+            ab.setNegativeButton("GALLERY", new DialogInterface.OnClickListener() {
 
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                    if( Build.VERSION.SDK_INT>= Build.VERSION_CODES.M){
+
+                        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED)
+                        {
+                            //Permission Denied
+                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
+
+                        }
+                        else {
+                            Intent i2=new Intent();
+                            i2.setType("image/*");
+                            i2.setAction(Intent.ACTION_GET_CONTENT);
+                            startActivityForResult(Intent.createChooser(i2,"Select An Image"),8);
+
+                        }
+                    }
                 }
-            }
+            });
+            ab.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                }
+            });
+
+            ab.show();
 
         } else if (id == R.id.nav_gallery) {
 
@@ -284,8 +325,23 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+            @Override
+            public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+                if(requestCode==1 && permissions== new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}){
+                    Intent i=new Intent();
+                    i.setType("image/*");
+                    i.setAction(Intent.ACTION_GET_CONTENT);
+                    startActivityForResult(Intent.createChooser(i,"Select An Image"),8);
 
-    public static class RecyclerViewHolder extends RecyclerView.ViewHolder{
+                }
+                if(requestCode==2 ){
+                    Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(cameraIntent, 9);
+                }
+            }
+
+            public static class RecyclerViewHolder extends RecyclerView.ViewHolder{
         View mview;
         public RecyclerViewHolder(View itemView) {
             super(itemView);
@@ -320,7 +376,12 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode==10)
         cA.onActivityOfResult(requestCode, resultCode, data);
+
+        if(resultCode==9 || requestCode==8){
+            Toast.makeText(MainActivity.this,"Data Received:"+data.toString(),Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
