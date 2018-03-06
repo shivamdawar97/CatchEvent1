@@ -172,6 +172,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+
     }
 
     @Override
@@ -507,6 +508,7 @@ public class MainActivity extends AppCompatActivity
                             }
                         });
                 container.addView(IM);
+
                 if(IM.getParent()!=null) {
                     ((ViewGroup) IM.getParent()).removeView(IM);
                 }
@@ -522,7 +524,9 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public int getCount() {
+
                 return 0;
+
             }
         });
 
@@ -530,7 +534,6 @@ public class MainActivity extends AppCompatActivity
         viewPager.setSlideInterval(3000);
         viewPager.setCycle(true);
         viewPager.setSlideDuration(1500);
-
         rv.setAdapter(new RecyclerView.Adapter<RecyclerViewHolder>() {
             @Override
             public RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -574,7 +577,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
         rv.setLayoutManager(new LinearLayoutManager(MainActivity.this));
-
+        rv.getAdapter().notifyDataSetChanged();
     }
 
 }

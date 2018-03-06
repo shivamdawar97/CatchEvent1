@@ -93,12 +93,21 @@
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/alert_recycler"
-        android:layout_width="match_parent"
+        android:layout_width="320dp"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/related_event"
-        android:layout_below="@+id/related_event" >
+        android:layout_above="@+id/button3"
+        android:layout_alignParentEnd="true">
 
     </android.support.v7.widget.RecyclerView>
+
+    <ImageButton
+        android:id="@+id/imageButton2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/related_event"
+        android:layout_below="@+id/related_event"
+        android:layout_marginTop="11dp"
+        app:srcCompat="@drawable/ic_add_a_photo_black_24dp" />
 
 
 </RelativeLayout>
