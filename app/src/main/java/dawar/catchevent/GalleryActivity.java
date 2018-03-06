@@ -35,8 +35,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.*;
-import com.bumptech.glide.module.GlideModule;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -66,8 +64,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import javax.net.ssl.HttpsURLConnection;
-
-import id.zelory.compressor.Compressor;
 import ru.dimorinny.floatingtextbutton.FloatingTextButton;
 
 public class GalleryActivity extends AppCompatActivity {
@@ -341,27 +337,6 @@ public class GalleryActivity extends AppCompatActivity {
                 mDialog.show();
                 filepathuri = data.getData();
 
-
-/*
-                String[] filePath = { MediaStore.Images.Media.DATA };
-                Cursor cursor = getContentResolver().query(filepathuri, filePath, null, null, null);
-                cursor.moveToFirst();
-                String imagePath = cursor.getString(cursor.getColumnIndex(filePath[0]));
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                compress = BitmapFactory.decodeFile(imagePath,options);
-                cursor.close();
-                try {
-                    compress=new Compressor(GalleryActivity.this)
-                            .setCompressFormat(Bitmap.CompressFormat.WEBP)
-                            .setMaxHeight(200)
-                            .setMaxWidth(100)
-                            .setQuality(60)
-                            .compressToBitmap(new File(filepathuri.getPath()));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                */
                 try {
                     compress= MediaStore.Images.Media.getBitmap( getContentResolver(),filepathuri);
                 } catch (IOException e) {

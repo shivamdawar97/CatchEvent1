@@ -8,9 +8,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -33,6 +36,7 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 
 import android.widget.AbsListView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 
@@ -45,6 +49,8 @@ import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -57,11 +63,18 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.UUID;
 
 
 public class MainActivity extends AppCompatActivity
@@ -375,12 +388,93 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode==10)
+    protected void onActivityResult(final int requestCode, int resultCode, final Intent data) {
+        if(requestCode==10)
         cA.onActivityOfResult(requestCode, resultCode, data);
 
-        if(resultCode==9 || requestCode==8){
-            Toast.makeText(MainActivity.this,"Data Received:"+data.toString(),Toast.LENGTH_SHORT).show();
+        if((requestCode==9 || requestCode==8) && data!=null){
+
+
+            AlertDialog.Builder builderSingle = new AlertDialog.Builder(MainActivity.this);
+            builderSingle.setTitle("Select One Name:-");
+            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.select_dialog_singlechoice);
+
+            for (String key: Events){
+               mdatabase.child("Events").child(key).addValueEventListener(new ValueEventListener() {
+                   @Override
+                   public void onDataChange(DataSnapshot dataSnapshot) {
+                       arrayAdapter.add(dataSnapshot.child("name").getValue().toString());
+                   }
+
+                   @Override
+                   public void onCancelled(DatabaseError databaseError) {
+
+                   }
+               });
+            }
+
+            builderSingle.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+
+            builderSingle.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, final int which) {
+                    String strName = arrayAdapter.getItem(which);
+                   Uri filepathuri = data.getData();
+                    StorageReference mstore= FirebaseStorage.getInstance().getReference();
+                    Bitmap compress=null;
+                   final ProgressDialog mDialog=new ProgressDialog(MainActivity.this);
+                   if(requestCode==9) {
+                       compress = (Bitmap) data.getExtras().get("data");
+                   }
+                   else {
+                       try {
+                           compress = MediaStore.Images.Media.getBitmap(getContentResolver(), filepathuri);
+                       } catch (IOException e) {
+                           e.printStackTrace();
+                       }
+                   }
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    compress.compress(Bitmap.CompressFormat.JPEG, 50, baos);
+
+                    byte[] data1 = baos.toByteArray();
+
+                    mstore=mstore.child("images").child(strName);
+                    mstore = mstore.child(push());
+                    mstore.putBytes(data1).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            @SuppressWarnings("VisibleForTests") final Uri dnldurl=taskSnapshot.getDownloadUrl();
+                            String s= Calendar.getInstance().getTime().toString();
+                            DatabaseReference newpost=mdatabase.child("Gallery").push();
+                            newpost.child("url").setValue(dnldurl.toString());
+                            newpost.child("date").setValue(s);
+                            s=newpost.getKey();
+                            newpost=mdatabase.child("Events").child(Events.get(which)).child("Gallery").push();
+                            newpost.setValue(s);
+                            Toast.makeText(MainActivity.this,"Image Uploaded Succesfully",
+                                    Toast.LENGTH_SHORT).show();
+                            mDialog.dismiss();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(MainActivity.this,"Uploadation Failed",Toast.LENGTH_SHORT).show();
+                            mDialog.dismiss();
+                        }
+                    });
+
+                }
+
+                private String push() {
+                   return  UUID.randomUUID().toString();
+                }
+            });
+            builderSingle.show();
         }
     }
 
@@ -416,11 +510,10 @@ public class MainActivity extends AppCompatActivity
                             }
                         });
                 container.addView(IM);
-
-                if(IM.getParent()!=null)
-                    ((ViewGroup)IM.getParent()).removeView(IM);
-                notifyDataSetChanged();
-                return IM;
+                if(IM.getParent()!=null) {
+                    ((ViewGroup) IM.getParent()).removeView(IM);
+                }
+                    return IM;
             }
 
             @Override
@@ -432,7 +525,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public int getCount() {
-                return 0;
+                return images.size();
             }
         });
 
