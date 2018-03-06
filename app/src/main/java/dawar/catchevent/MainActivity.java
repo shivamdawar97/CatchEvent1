@@ -525,7 +525,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public int getCount() {
-                return images.size();
+                return 0;
             }
         });
 

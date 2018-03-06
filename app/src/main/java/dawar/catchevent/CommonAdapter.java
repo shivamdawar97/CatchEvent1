@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInApi;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
@@ -88,23 +89,25 @@ public  class CommonAdapter  {
             public void onClick(DialogInterface dialog, int which) {
                 m_Text = input.getText().toString();
                 if (m_Text.equals("54321")) {
-                    GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                            .requestIdToken(ctx.getString(R.string.default_web_client_id))
-                            .requestEmail()
-                            .build();
+
+                   GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                                .requestIdToken(ctx.getString(R.string.default_web_client_id))
+                                .requestEmail()
+                                .build();
 
                     mgoogleApiClient=new GoogleApiClient.Builder(ctx.getApplicationContext())
                             .enableAutoManage( (FragmentActivity)ctx, new GoogleApiClient.OnConnectionFailedListener() {
                                 @Override
                                 public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                                    Toast.makeText(ctx,"LogIn Failed",Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(ctx,"LogIn Failed "+connectionResult.getErrorMessage(),Toast.LENGTH_SHORT).show();
                                 }
                             }).addApi(Auth.GOOGLE_SIGN_IN_API,gso)
                             .build();
 
                     Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mgoogleApiClient);
                     ((Activity)ctx).startActivityForResult(signInIntent, RC_SIGN_IN);
-
+                    mgoogleApiClient.stopAutoManage( ((FragmentActivity) ctx));
+                    mgoogleApiClient.disconnect();
                 } else {
 
                     builder.setMessage("Wrong key");
