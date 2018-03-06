@@ -238,9 +238,6 @@ public class MainActivity extends AppCompatActivity
 
         }
         if(id== R.id.refresh){
-            Toast.makeText(MainActivity.this,"Refresh icon ",Toast.LENGTH_SHORT).show();
-            finish();
-            startActivity(getIntent());
             rv.getAdapter().notifyDataSetChanged();
             viewPager.getAdapter().notifyDataSetChanged();
         }

@@ -336,14 +336,20 @@ public class GalleryActivity extends AppCompatActivity {
                 mDialog.setMessage("Please Wait!");
                 mDialog.show();
                 filepathuri = data.getData();
-
+                int c1,c2;
                 try {
                     compress= MediaStore.Images.Media.getBitmap( getContentResolver(),filepathuri);
+                     c1=compress.getByteCount();
+                    c2=compress.getDensity();
+                   Toast.makeText(GalleryActivity.this,"Before :"+c1+"\n :"+c2,Toast.LENGTH_SHORT).show();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 compress.compress(Bitmap.CompressFormat.JPEG, 60, baos);
+                c1=compress.getByteCount();
+                c2=compress.getDensity();
+                Toast.makeText(GalleryActivity.this,"After :"+c1+"\n :"+c2,Toast.LENGTH_SHORT).show();
 
                 byte[] data1 = baos.toByteArray();
 
@@ -478,6 +484,9 @@ public class GalleryActivity extends AppCompatActivity {
 
         }
 
+        if(id== R.id.refresh){
+            imagerecycler.getAdapter().notifyDataSetChanged();
+        }
         return super.onOptionsItemSelected(item);
     }
     }
