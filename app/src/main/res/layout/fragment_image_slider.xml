@@ -20,6 +20,17 @@
         android:text="TextView"
         android:textColor="@color/cardview_light_background"
         android:textSize="24sp" />
+    <TextView
+        android:id="@+id/caption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Caption"
+        android:textSize="25sp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="140dp"
+        android:layout_marginLeft="16dp"
+        android:textColor="@color/cardview_light_background"
+        />
 
     <TextView
         android:id="@+id/idate"
@@ -29,8 +40,7 @@
         android:layout_alignParentLeft="true"
         android:layout_centerInParent="true"
         android:layout_marginBottom="100dp"
-        android:layout_marginLeft="30dp"
-        android:backgroundTint="@color/common_google_signin_btn_text_light_default"
+        android:layout_marginLeft="16dp"
         android:text="Date"
         android:textColor="@color/cardview_light_background"
         android:textSize="20sp" />

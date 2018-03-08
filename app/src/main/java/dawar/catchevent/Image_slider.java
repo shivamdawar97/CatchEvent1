@@ -27,8 +27,8 @@ public class Image_slider extends Fragment {
         private int pos;
         private ViewPager viewPager;
         private ArrayList<String> dates;
-        private ArrayList<String> images;
-        TextView dateview,counts;
+        private ArrayList<String> images,captns;
+        TextView dateview,counts,captn;
     public Image_slider() {
         // Required empty public constructor
     }
@@ -42,9 +42,11 @@ public class Image_slider extends Fragment {
         pos=getArguments().getInt("pos");
         dates=getArguments().getStringArrayList("dts");
         images=getArguments().getStringArrayList("img");
+        captns=getArguments().getStringArrayList("cts");
         viewPager=view.findViewById(R.id.gal_pager);
         dateview=view.findViewById(R.id.idate);
         counts=view.findViewById(R.id.lbl_count);
+        captn=view.findViewById(R.id.caption);
         return view;
     }
 
@@ -97,6 +99,7 @@ public class Image_slider extends Fragment {
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                counts.setText(""+(position+1)+"/"+dates.size());
                 dateview.setText(dates.get(position));
+                captn.setText(captns.get(position));
             }
 
             @Override

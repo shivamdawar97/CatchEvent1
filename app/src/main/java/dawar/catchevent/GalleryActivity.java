@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -29,15 +30,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Gallery;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.measurement.AppMeasurement;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -56,10 +60,6 @@ import com.squareup.picasso.Picasso;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.text.AttributedCharacterIterator;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -82,7 +82,7 @@ public class GalleryActivity extends AppCompatActivity {
     private Bitmap compress;
     private FirebaseUser muser;
     private ArrayList<String> images;
-    private ArrayList<String> dates;
+    private ArrayList<String> dates,captns;
     private FirebaseAuth mAuth;
 
 
@@ -93,6 +93,7 @@ public class GalleryActivity extends AppCompatActivity {
         ftb=findViewById(R.id.ftb);
         images=new ArrayList<>();
         dates=new ArrayList<>();
+        captns=new ArrayList<>();
         mstore= FirebaseStorage.getInstance().getReference();
         mdata= FirebaseDatabase.getInstance().getReference();
         imagerecycler=findViewById(R.id.gallery_recycler);
@@ -126,10 +127,17 @@ public class GalleryActivity extends AppCompatActivity {
                 mdata.child("Gallery").child(s).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        String s = dataSnapshot.child("url").getValue().toString();
-                        images.add(0,s);
-                        s = dataSnapshot.child("date").getValue().toString();
-                        dates.add(0,s);
+                        try {
+                            String s = dataSnapshot.child("url").getValue().toString();
+                            images.add(0,s);
+                            s = dataSnapshot.child("date").getValue().toString();
+                            dates.add(0,s);
+                            s=dataSnapshot.child("captn").getValue().toString();
+                            captns.add(0,s);
+                        }
+                       catch (NullPointerException e){
+
+                       }
 
                     }
 
@@ -212,10 +220,18 @@ public class GalleryActivity extends AppCompatActivity {
             mdata.child("Gallery").addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    s=dataSnapshot.child("url").getValue().toString();
-                    images.add(0,s);
-                    s = dataSnapshot.child("date").getValue().toString();
-                    dates.add(0,s);
+                    try {
+                        s=dataSnapshot.child("url").getValue().toString();
+                        images.add(0,s);
+                        s = dataSnapshot.child("date").getValue().toString();
+                        dates.add(0,s);
+                        s=dataSnapshot.child("captn").getValue().toString();
+                        captns.add(0,s);
+                    }
+                    catch (NullPointerException e){
+
+                    }
+
                 }
 
                 @Override
@@ -247,7 +263,7 @@ public class GalleryActivity extends AppCompatActivity {
 
 
         if(t==1 || t==3) {
-            //Update rescycler View with images for a particular Event or for all
+            //Update rescycler View with images for a particular Event or for All
             imagerecycler.setAdapter(new RecyclerView.Adapter<RecyclerViewHolder>() {
                 @Override
                 public RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -266,6 +282,7 @@ public class GalleryActivity extends AppCompatActivity {
                             b.putInt("pos", position);
                             b.putStringArrayList("img", images);
                             b.putStringArrayList("dts", dates);
+                            b.putStringArrayList("cts",captns);
                             android.support.v4.app.FragmentTransaction t = getSupportFragmentManager().beginTransaction().addToBackStack(null);
                             Image_slider image_slider = new Image_slider();
                             image_slider.setArguments(b);
@@ -281,11 +298,12 @@ public class GalleryActivity extends AppCompatActivity {
                 }
             });
 
-            imagerecycler.setLayoutManager(new GridLayoutManager(GalleryActivity.this, 1));
+            imagerecycler.setLayoutManager(new GridLayoutManager(GalleryActivity.this, 2));
         }
         else  {
 
             imagerecycler.setAdapter(new RecyclerView.Adapter<RecyclerViewHolder>() {
+                //Adapter for Alerts
                 @Override
                 public RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                    View view=LayoutInflater.from(GalleryActivity.this).inflate(R.layout.alert_view,parent,false);
@@ -332,53 +350,73 @@ public class GalleryActivity extends AppCompatActivity {
         protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
             if(requestCode==234 && resultCode==RESULT_OK && data!=null && data.getData()!=null) {
+                final AlertDialog.Builder builder=new AlertDialog.Builder(GalleryActivity.this);
+                final EditText caption=new EditText(GalleryActivity.this);
+                final String[] cptn = new String[1];
                 mDialog.setTitle("Uploading");
                 mDialog.setMessage("Please Wait!");
-                mDialog.show();
+
                 filepathuri = data.getData();
-                int c1,c2;
                 try {
                     compress= MediaStore.Images.Media.getBitmap( getContentResolver(),filepathuri);
-                     c1=compress.getByteCount();
-                    c2=compress.getDensity();
-                   Toast.makeText(GalleryActivity.this,"Before :"+c1+"\n :"+c2,Toast.LENGTH_SHORT).show();
-                } catch (IOException e) {
+
+                      }
+                      catch (IOException e) {
                     e.printStackTrace();
                 }
+
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                compress.compress(Bitmap.CompressFormat.JPEG, 60, baos);
-                c1=compress.getByteCount();
-                c2=compress.getDensity();
-                Toast.makeText(GalleryActivity.this,"After :"+c1+"\n :"+c2,Toast.LENGTH_SHORT).show();
+                if(compress.getByteCount()>1024) {
+                    compress.compress(Bitmap.CompressFormat.JPEG, 40, baos);
+                }
+                else {
+                    compress.compress(Bitmap.CompressFormat.JPEG, 60, baos);
 
-                byte[] data1 = baos.toByteArray();
+                }
+                final byte[] data1 = baos.toByteArray();
+                builder.setView(caption).setTitle("Enter a Caption:");
 
-                riversRef=mstore.child("images").child(getIntent().getStringExtra("name"));
-                riversRef = riversRef.child(filepathuri.getLastPathSegment());
-                riversRef.putBytes(data1).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        @SuppressWarnings("VisibleForTests") final Uri dnldurl=taskSnapshot.getDownloadUrl();
-                        String s= Calendar.getInstance().getTime().toString();
-                       DatabaseReference newpost=mdata.child("Gallery").push();
-                        newpost.child("url").setValue(dnldurl.toString());
-                        newpost.child("date").setValue(s);
-                        s=newpost.getKey();
-                        newpost=mdata.child("Events").child(keyID).child("Gallery").push();
-                        newpost.setValue(s);
-                        Toast.makeText(GalleryActivity.this,"Image Uploaded Succesfully",
-                                Toast.LENGTH_SHORT).show();
-                        mDialog.dismiss();
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(GalleryActivity.this,"Uploadation Failed",Toast.LENGTH_SHORT).show();
-                        mDialog.dismiss();
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        cptn[0] =caption.getText().toString();
+                        if(!cptn[0].isEmpty()){
+                            dialogInterface.dismiss();
+                            mDialog.show();
+                            riversRef=mstore.child("images").child(getIntent().getStringExtra("name"));
+                            riversRef = riversRef.child(filepathuri.getLastPathSegment());
+                            riversRef.putBytes(data1).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                    @SuppressWarnings("VisibleForTests") final Uri dnldurl=taskSnapshot.getDownloadUrl();
+                                    String s= Calendar.getInstance().getTime().toString();
+                                    DatabaseReference newpost=mdata.child("Gallery").push();
+                                    newpost.child("url").setValue(dnldurl.toString());
+                                    newpost.child("date").setValue(s);
+                                    newpost.child("captn").setValue(cptn[0]);
+                                    s=newpost.getKey();
+                                    newpost=mdata.child("Events").child(keyID).child("Gallery").push();
+                                    newpost.setValue(s);
+                                    Toast.makeText(GalleryActivity.this,"Image Uploaded Succesfully",
+                                            Toast.LENGTH_SHORT).show();
+                                    mDialog.dismiss();
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(GalleryActivity.this,"Uploadation Failed",Toast.LENGTH_SHORT).show();
+                                    mDialog.dismiss();
+                                }
+                            });
+                        }
+                        else {
+                            builder.setMessage("Please Enter a caption");
+                        }
                     }
                 });
 
 
+                builder.show();
             }
             else {
                 mAuth=FirebaseAuth.getInstance();
@@ -410,8 +448,13 @@ public class GalleryActivity extends AppCompatActivity {
                     pd.dismiss();
                 }
             });
-           // im.setImageBitmap(img);
 
+
+        }
+        public void setMviewforAlert(Bitmap b,Context ctx){
+            final ImageView im=mview.findViewById(R.id.gallery_img);
+             im.setImageBitmap(b);
+             Toast.makeText(ctx,"Image added",Toast.LENGTH_SHORT).show();
         }
 
         public void setAlert(String s1, String s2){
