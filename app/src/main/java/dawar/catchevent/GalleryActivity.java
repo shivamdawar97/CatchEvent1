@@ -315,7 +315,7 @@ public class GalleryActivity extends AppCompatActivity {
                     mdata=FirebaseDatabase.getInstance().getReference().child("Alerts");
                         mdata.child(images.get(position)).addValueEventListener(new ValueEventListener() {
                             @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
+                            public void onDataChange(final DataSnapshot dataSnapshot) {
 
                                 String s1 = "<font color='#bf4080'> " + dataSnapshot.child("title").getValue().toString() +
                                         "</font><br/> Event:" + dataSnapshot.child("ename").getValue().toString();
@@ -324,7 +324,10 @@ public class GalleryActivity extends AppCompatActivity {
                                 holder.mview.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
-
+                                        Intent i= new Intent(GalleryActivity.this,AlertDetails.class);
+                                        i.putExtra("key",dataSnapshot.getKey());
+                                        i.putExtra("title",getIntent().getStringExtra("name"));
+                                        startActivity(i);
                                     }
                                 });
                             }

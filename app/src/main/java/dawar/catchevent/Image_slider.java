@@ -39,79 +39,87 @@ public class Image_slider extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view=inflater.inflate(R.layout.fragment_image_slider, container, false);
-        pos=getArguments().getInt("pos");
-        dates=getArguments().getStringArrayList("dts");
-        images=getArguments().getStringArrayList("img");
-        captns=getArguments().getStringArrayList("cts");
         viewPager=view.findViewById(R.id.gal_pager);
         dateview=view.findViewById(R.id.idate);
         counts=view.findViewById(R.id.lbl_count);
         captn=view.findViewById(R.id.caption);
+
+        pos=getArguments().getInt("pos");
+        if(pos!=-1) {
+            dates = getArguments().getStringArrayList("dts");
+            images = getArguments().getStringArrayList("img");
+            captns = getArguments().getStringArrayList("cts");
+
+        }
+        else {
+            dates=new ArrayList<>();
+            images=new ArrayList<>();
+            captns=new ArrayList<>();
+
+            dates.add(getArguments().getString("dts"));
+            images.add(getArguments().getString("img"));
+            captns.add(getArguments().getString("cts"));
+            counts.setVisibility(View.INVISIBLE);
+
+        }
+
+
         return view;
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        viewPager.setAdapter(new PagerAdapter() {
-            @Override
-            public int getCount() {
-                return images.size();
-            }
 
-            @Override
-            public boolean isViewFromObject(View view, Object object) {
-                return (view ==(ImageView)object);
-            }
+            viewPager.setAdapter(new PagerAdapter() {
+                @Override
+                public int getCount() {
+                    return images.size();
+                }
 
-            @Override
-            public Object instantiateItem(ViewGroup container, final int position) {
-                final ImageView IM= new ImageView(getContext());
-                IM.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT));
-                Picasso.with(getContext()).load(images.get(position)).networkPolicy(NetworkPolicy.OFFLINE).into(IM, new Callback() {
-                    @Override
-                    public void onSuccess() {
+                @Override
+                public boolean isViewFromObject(View view, Object object) {
+                    return (view == (ImageView) object);
+                }
 
-                    }
-
-                    @Override
-                    public void onError() {
-                        Picasso.with(getContext()).load(images.get(position)).networkPolicy(NetworkPolicy.OFFLINE).into(IM);
-
-                    }
-                });
-                container.addView(IM);
+                @Override
+                public Object instantiateItem(ViewGroup container, final int position) {
+                    final ImageView IM = new ImageView(getContext());
+                    IM.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT));
+                    Picasso.with(getContext()).load(images.get(position)).networkPolicy(NetworkPolicy.OFFLINE).into(IM);
+                    container.addView(IM);
 //                notifyDataSetChanged();
-                return IM;
-            }
+                    return IM;
+                }
 
-            @Override
-            public void destroyItem(ViewGroup container, int position, Object object) {
+                @Override
+                public void destroyItem(ViewGroup container, int position, Object object) {
 
 //                super.destroyItem(container, position, object);
-                container.removeView((ImageView)object);
-            }
-        });
-        viewPager.setCurrentItem(pos);
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-               counts.setText(""+(position+1)+"/"+dates.size());
-                dateview.setText(dates.get(position));
-                captn.setText(captns.get(position));
-            }
+                    container.removeView((ImageView) object);
+                }
+            });
+            viewPager.setCurrentItem(pos);
+            viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                    counts.setText("" + (position + 1) + "/" + dates.size());
+                    dateview.setText(dates.get(position));
+                    captn.setText(captns.get(position));
+                }
 
-            @Override
-            public void onPageSelected(int position) {
+                @Override
+                public void onPageSelected(int position) {
 
 
-            }
+                }
 
-            @Override
-            public void onPageScrollStateChanged(int state) {
+                @Override
+                public void onPageScrollStateChanged(int state) {
 
-            }
-        });
-    }
+                }
+            });
+        }
+
 }

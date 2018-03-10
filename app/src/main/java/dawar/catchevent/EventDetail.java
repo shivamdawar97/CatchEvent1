@@ -172,12 +172,14 @@ public class EventDetail extends AppCompatActivity {
         Intent i=new Intent(EventDetail.this,GalleryActivity.class);
             if(view.getId()==R.id.gal_btn){
                 i.putExtra("view",1);
+                i.putExtra("name",s+">>Gallery");
             }
-            else
-                i.putExtra("view",2);
-
+            else {
+                i.putExtra("view", 2);
+                i.putExtra("name",s+">>Alerts");
+            }
         i.putExtra("key",keyID);
-        i.putExtra("name",s);
+
 
         startActivity(i);
     }
