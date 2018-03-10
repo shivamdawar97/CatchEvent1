@@ -426,18 +426,21 @@ public class MainActivity extends AppCompatActivity
                     StorageReference mstore= FirebaseStorage.getInstance().getReference();
                     Bitmap compress=null;
                    final ProgressDialog mDialog=new ProgressDialog(MainActivity.this);
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
                    if(requestCode==9) {
                        compress = (Bitmap) data.getExtras().get("data");
+                       compress.compress(Bitmap.CompressFormat.JPEG, 90, baos);
                    }
                    else {
                        try {
                            compress = MediaStore.Images.Media.getBitmap(getContentResolver(), filepathuri);
+                           compress.compress(Bitmap.CompressFormat.JPEG, 50, baos);
                        } catch (IOException e) {
                            e.printStackTrace();
                        }
                    }
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    compress.compress(Bitmap.CompressFormat.JPEG, 50, baos);
+
+
 
                     byte[] data1 = baos.toByteArray();
 

@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -18,6 +20,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -155,8 +159,18 @@ public class AlertDetails extends AppCompatActivity {
                 super(itemView);
                  im=itemView.findViewById(R.id.gallery_img);
             }
-            protected void setImage(String image){
-                Picasso.with(AlertDetails.this).load(image).into(im);
+            protected void setImage(final String image){
+                Picasso.with(AlertDetails.this).load(image).networkPolicy(NetworkPolicy.OFFLINE).into(im, new Callback() {
+                    @Override
+                    public void onSuccess() {
+
+                    }
+
+                    @Override
+                    public void onError() {
+                        Picasso.with(AlertDetails.this).load(image).into(im);
+                    }
+                });
             }
         }
     }
@@ -166,4 +180,23 @@ public class AlertDetails extends AppCompatActivity {
         finish();
         return super.onSupportNavigateUp();
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        menu.removeItem(R.id.action_logout);
+        menu.removeItem(R.id.action_login);
+        menu.removeItem(R.id.action_settings);
+        MenuItem item=menu.findItem(R.id.refresh);
+        item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                al_rv.getAdapter().notifyDataSetChanged();
+                return AlertDetails.super.onOptionsItemSelected(menuItem);
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
+    }
+
+
 }
