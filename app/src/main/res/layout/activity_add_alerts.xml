@@ -102,10 +102,11 @@
 
     <ImageButton
         android:id="@+id/add_alr_img"
-        android:layout_width="80dp"
+        android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/related_event"
+        android:background="@color/bgname"
         android:onClick="addImages"
         app:srcCompat="@drawable/ic_add_a_photo_black_24dp" />
 

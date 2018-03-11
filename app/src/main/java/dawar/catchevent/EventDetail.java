@@ -64,43 +64,51 @@ public class EventDetail extends AppCompatActivity {
         mdata.child("Events").child(keyID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                s=dataSnapshot.child("name").getValue().toString();
-                title.setText(s);
-                android.support.v7.app.ActionBar actionBar = getSupportActionBar();
-                actionBar.setTitle(s);
-                actionBar.setDisplayHomeAsUpEnabled(true);
-                Picasso.with(EventDetail.this).load(dataSnapshot.child("image").getValue().toString()).into(imageView);
-                date.setText(" DATE :"+ dataSnapshot.child("date").getValue());
-                date.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_date_range_black_24dp,0,0,0);
-                time.setText(" Timings :"+dataSnapshot.child("time").getValue().toString()+
-                "\n Venue:"+dataSnapshot.child("venue").getValue().toString());
-                time.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_place_black_24dp,0,0,0);
-                desc.setText(dataSnapshot.child("desc").getValue().toString());
-                String newtext;
-                if(dataSnapshot.hasChild("regfee")) {
-                    newtext = dataSnapshot.child("regfee").getValue().toString();
-                    regfee.setText(" Registration Fee : " + newtext);
-                    regfee.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_attach_money_black_24dp,0,0,0);
+
+                try {
+
+
+                    s = dataSnapshot.child("name").getValue().toString();
+                    title.setText(s);
+                    android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+                    actionBar.setTitle(s);
+                    actionBar.setDisplayHomeAsUpEnabled(true);
+                    Picasso.with(EventDetail.this).load(dataSnapshot.child("image").getValue().toString()).into(imageView);
+                    date.setText(" DATE :" + dataSnapshot.child("date").getValue());
+                    date.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_date_range_black_24dp, 0, 0, 0);
+                    time.setText(" Timings :" + dataSnapshot.child("time").getValue().toString() +
+                            "\n Venue:" + dataSnapshot.child("venue").getValue().toString());
+                    time.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_place_black_24dp, 0, 0, 0);
+                    desc.setText(dataSnapshot.child("desc").getValue().toString());
+                    String newtext;
+                    if (dataSnapshot.hasChild("regfee")) {
+                        newtext = dataSnapshot.child("regfee").getValue().toString();
+                        regfee.setText(" Registration Fee : " + newtext);
+                        regfee.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_attach_money_black_24dp, 0, 0, 0);
+                    }
+                    if (dataSnapshot.hasChild("fstpz")) {
+                        newtext = dataSnapshot.child("fstpz").getValue().toString();
+                        regfee.append("\n First Prize : " + newtext);
+                    }
+                    if (dataSnapshot.hasChild("sndpz")) {
+                        newtext = dataSnapshot.child("sndpz").getValue().toString();
+                        regfee.append("\n Second Prize : " + newtext);
+                    }
+                    if (dataSnapshot.hasChild("thrdpz")) {
+                        newtext = dataSnapshot.child("thrdpz").getValue().toString();
+                        regfee.append("\n Third Prize : " + newtext);
+                    }
                 }
-                if(dataSnapshot.hasChild("fstpz")) {
-                    newtext = dataSnapshot.child("fstpz").getValue().toString();
-                    regfee.append("\n First Prize : " + newtext);
-                }
-                if(dataSnapshot.hasChild("sndpz")) {
-                    newtext = dataSnapshot.child("sndpz").getValue().toString();
-                    regfee.append("\n Second Prize : " + newtext);
-                }
-                if(dataSnapshot.hasChild("thrdpz")) {
-                    newtext = dataSnapshot.child("thrdpz").getValue().toString();
-                    regfee.append("\n Third Prize : " + newtext);
+                catch (NullPointerException e){
+                    finish();
                 }
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
         });
+
 
     }
     @Override

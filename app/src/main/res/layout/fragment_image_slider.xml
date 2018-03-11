@@ -20,30 +20,31 @@
         android:text="TextView"
         android:textColor="@color/cardview_light_background"
         android:textSize="24sp" />
+
     <TextView
         android:id="@+id/caption"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_above="@+id/idate"
+        android:layout_alignParentStart="true"
+        android:background="@color/trans_black"
         android:text="Caption"
-        android:textSize="25sp"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="140dp"
-        android:layout_marginLeft="16dp"
         android:textColor="@color/cardview_light_background"
-        />
+        android:textSize="25sp" />
 
     <TextView
         android:id="@+id/idate"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_centerInParent="true"
-        android:layout_marginBottom="100dp"
-        android:layout_marginLeft="16dp"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="96dp"
+        android:background="@color/trans_black"
         android:text="Date"
+        android:gravity="center"
         android:textColor="@color/cardview_light_background"
-        android:textSize="20sp" />
+        android:textSize="17sp" />
 
 
 

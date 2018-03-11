@@ -316,20 +316,26 @@ public class GalleryActivity extends AppCompatActivity {
                         mdata.child(images.get(position)).addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(final DataSnapshot dataSnapshot) {
+                                try {
+                                    String s1 = "<font color='#bf4080'> " + dataSnapshot.child("title").getValue().toString() +
+                                            "</font><br/> Event:" + dataSnapshot.child("ename").getValue().toString();
+                                    String s2 = dataSnapshot.child("date").getValue().toString();
+                                    holder.setAlert(s1, s2);
+                                    holder.mview.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            Intent i= new Intent(GalleryActivity.this,AlertDetails.class);
+                                            i.putExtra("key",dataSnapshot.getKey());
+                                            i.putExtra("title",getIntent().getStringExtra("name"));
+                                            startActivity(i);
+                                        }
+                                    });
+                                }catch (NullPointerException e){
+                                  //  images.remove(position);
+                                    finish();
+                                    startActivity(new Intent(GalleryActivity.this,MainActivity.class));
+                                }
 
-                                String s1 = "<font color='#bf4080'> " + dataSnapshot.child("title").getValue().toString() +
-                                        "</font><br/> Event:" + dataSnapshot.child("ename").getValue().toString();
-                                String s2 = dataSnapshot.child("date").getValue().toString();
-                                holder.setAlert(s1, s2);
-                                holder.mview.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        Intent i= new Intent(GalleryActivity.this,AlertDetails.class);
-                                        i.putExtra("key",dataSnapshot.getKey());
-                                        i.putExtra("title",getIntent().getStringExtra("name"));
-                                        startActivity(i);
-                                    }
-                                });
                             }
 
                             @Override

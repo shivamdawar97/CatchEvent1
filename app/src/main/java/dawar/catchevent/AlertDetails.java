@@ -2,6 +2,7 @@ package dawar.catchevent;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -11,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -27,7 +29,8 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 public class AlertDetails extends AppCompatActivity {
-    TextView t1,t2,t3,t4;
+    TextView t1,t3,t4;
+    EditText t2;
     RecyclerView al_rv;
     String key;
     DatabaseReference mdata;
@@ -52,10 +55,17 @@ public class AlertDetails extends AppCompatActivity {
         mdata.child("Alerts").child(key).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                t1.setText(dataSnapshot.child("title").getValue().toString());
-                t2.setText(dataSnapshot.child("desc").getValue().toString());
-                t3.append(dataSnapshot.child("ename").getValue().toString());
-                t4.setText(dataSnapshot.child("date").getValue().toString());
+                try {
+                    t1.setText(dataSnapshot.child("title").getValue().toString());
+                    t2.setText(dataSnapshot.child("desc").getValue().toString());
+                    t3.append(dataSnapshot.child("ename").getValue().toString());
+                    t4.setText(dataSnapshot.child("date").getValue().toString());
+                }
+                catch (NullPointerException e){
+                    Intent i=new Intent(AlertDetails.this,MainActivity.class);
+                    startActivity(i);
+                }
+
 
             }
 
@@ -110,15 +120,23 @@ public class AlertDetails extends AppCompatActivity {
             mdata.child("Gallery").child(images.get(position)).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(final DataSnapshot dataSnapshot) {
-                   final String s;
-                   s=dataSnapshot.child("url").getValue().toString();
+                    String s=null;
+                   try {
+                       s=dataSnapshot.child("url").getValue().toString();
+                   }
+                   catch (NullPointerException e){
+                       finish();
+                       startActivity(new Intent(AlertDetails.this,MainActivity.class));
+                   }
+
                     holder.setImage(s);
+                    final String finalS = s;
                     holder.im.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
                             Bundle bundle=new Bundle();
 
-                            bundle.putString("img",s);
+                            bundle.putString("img", finalS);
                                 try {
                                     bundle.putString("cts",dataSnapshot.child("captn").getValue().toString());
 

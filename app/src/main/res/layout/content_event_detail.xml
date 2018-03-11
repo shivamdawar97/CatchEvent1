@@ -91,6 +91,7 @@
                 android:autoLink="all"
                 android:textSize="20sp" />
 
+
             <Button
                 android:id="@+id/gal_btn"
                 android:layout_width="match_parent"
@@ -114,7 +115,6 @@
                 android:drawableLeft="@android:drawable/star_big_off"
                 android:textAlignment="textStart"
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Large" />
-
 
 
         </LinearLayout>

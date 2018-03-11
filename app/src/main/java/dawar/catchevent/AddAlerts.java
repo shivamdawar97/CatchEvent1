@@ -118,6 +118,7 @@ public class AddAlerts extends AppCompatActivity {
            DatabaseReference newPost=mdata.child("Alerts").push();
             String s = title.getText().toString();
            newPost.child("title").setValue(s);
+           riversRef = riversRef.child(s);
            s =desc.getText().toString();
            newPost.child("desc").setValue(s);
            s = Calendar.getInstance().getTime().toString();
@@ -140,8 +141,7 @@ public class AddAlerts extends AppCompatActivity {
                final byte[] data1 = baos.toByteArray();
                final int finalI = i;
                final DatabaseReference finalNewPost = newPost;
-               riversRef = riversRef.child( UUID.randomUUID().toString());
-               riversRef.putBytes(data1).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+               riversRef.child( UUID.randomUUID().toString()).putBytes(data1).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                    @Override
                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                        @SuppressWarnings("VisibleForTests")

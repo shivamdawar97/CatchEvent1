@@ -22,4 +22,8 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_list">ListActivity</string>
     <string name="title_activity_add_alerts">AddAlerts</string>
+    <string name="title_activity_splash">Splash</string>
+    <string name="title_activity_about_us">AboutUs</string>
+    <string name="share_ex">Tell us your Expirience with this app.
+        If app get crashed tell us where it does.</string>
 </resources>

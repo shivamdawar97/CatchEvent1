@@ -9,6 +9,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -38,8 +40,10 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -86,7 +90,10 @@ public class MainActivity extends AppCompatActivity
     AlertDialog.Builder builder;
     AutoScrollViewPager viewPager;
     DatabaseReference mdatabase;
-    ArrayList<String> Events,images;
+    int[] Array;
+    String[] string;
+    ArrayList<String> Events;
+   // ArrayList<String> images;
     CommonAdapter cA;
     FloatingActionButton fab;
     private FirebaseAuth mAuth;
@@ -102,8 +109,11 @@ public class MainActivity extends AppCompatActivity
         viewPager=findViewById(R.id.vpager);
         cA = new CommonAdapter(MainActivity.this,mAuth);
         Events=new ArrayList<>();
-        images=new ArrayList<>();
+       // images=new ArrayList<>();
         m_Text=new String("");
+        Array= new int[]{R.drawable.events,R.drawable.techno,R.drawable.cultural,R.drawable.sports,
+        R.drawable.fun};
+        string= new String[]{"Hello","Techno","Cultural","Sports","Fun"};
         rv=  findViewById(R.id.recycler_view);
          fab =  findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -132,22 +142,17 @@ public class MainActivity extends AppCompatActivity
        mdatabase=FirebaseDatabase.getInstance().getReference();
         mdatabase.keepSynced(true);
         mdatabase.child("Events").addChildEventListener(new ChildEventListener() {
+            String p;
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                s = dataSnapshot.getKey();
-                Events.add(0,s);
-                mdatabase.child("Events").child(s).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                           images.add(dataSnapshot.child("image").getValue().toString());
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
+                try {
+                    s = dataSnapshot.getKey();
+                    Events.add(0,s);
+                    p=dataSnapshot.child("image").getValue().toString();
+                    //images.add(p);
+                }
+                catch (NullPointerException e)
+                {}
 
             }
 
@@ -158,6 +163,9 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
+                Events.remove(dataSnapshot.getKey());
+                rv.getAdapter().notifyDataSetChanged();
+                //images.remove(p);
 
             }
 
@@ -172,8 +180,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-
-    }
+     }
 
     @Override
     public void onBackPressed() {
@@ -257,58 +264,64 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_camera) {
             // Handle the camera action
-            AlertDialog.Builder ab=new AlertDialog.Builder(MainActivity.this);
-            ab.setTitle("Choose Image Source:");
-            ab.setPositiveButton("CAMERA", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                    if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA)!= PackageManager.PERMISSION_GRANTED)
-                    {
-                        //Permission Denied
-                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CAMERA},2);
-                    }
-                    else {
-                        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                        startActivityForResult(cameraIntent, 9);
+            muser=mAuth.getCurrentUser();
+            if(muser==null){
+                Toast.makeText(MainActivity.this,"You are not Registered",Toast.LENGTH_SHORT).show();
 
-                    }
-
-                }
-            });
-            ab.setNegativeButton("GALLERY", new DialogInterface.OnClickListener() {
-
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                    if( Build.VERSION.SDK_INT>= Build.VERSION_CODES.M){
-
-                        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED)
-                        {
+            }
+            else {
+                AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this);
+                ab.setTitle("Choose Image Source:");
+                ab.setPositiveButton("CAMERA", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                             //Permission Denied
-                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
+                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CAMERA}, 2);
+                        } else {
+                            Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                            startActivityForResult(cameraIntent, 9);
 
                         }
-                        else {
-                            Intent i2=new Intent();
-                            i2.setType("image/*");
-                            i2.setAction(Intent.ACTION_GET_CONTENT);
-                            startActivityForResult(Intent.createChooser(i2,"Select An Image"),8);
 
+                    }
+                });
+                ab.setNegativeButton("GALLERY", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                            if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                                //Permission Denied
+                                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+
+                            } else {
+                                Intent i2 = new Intent();
+                                i2.setType("image/*");
+                                i2.setAction(Intent.ACTION_GET_CONTENT);
+                                startActivityForResult(Intent.createChooser(i2, "Select An Image"), 8);
+
+                            }
                         }
                     }
-                }
-            });
-            ab.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                }
-            });
+                });
+                ab.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
 
-            ab.show();
+                ab.show();
 
-        } else if (id == R.id.nav_gallery) {
+                //here
+            }
+        }
+
+        else if (id == R.id.nav_gallery) {
 
         intent=new Intent(this,GalleryActivity.class);
         intent.putExtra("view",3);
@@ -323,12 +336,16 @@ public class MainActivity extends AppCompatActivity
             startActivity(intent);
 
         }  else if (id == R.id.nav_aboutus) {
+            intent=new Intent(MainActivity.this,AboutUs.class);
+            intent.putExtra("pg",1);
+            startActivity(intent );
 
 
 
         } else if (id == R.id.nav_send_feedback) {
-
-
+            intent=new Intent(MainActivity.this,AboutUs.class);
+            intent.putExtra("pg",2);
+            startActivity(intent );
         }
 
         DrawerLayout drawer =  findViewById(R.id.drawer_layout);
@@ -390,7 +407,7 @@ public class MainActivity extends AppCompatActivity
         if(requestCode==10)
         cA.onActivityOfResult(requestCode, resultCode, data);
 
-        if((requestCode==9 || requestCode==8) && data!=null){
+        if((requestCode==9 || requestCode==8) && data!=null && data.getExtras()!=null){
 
 
             AlertDialog.Builder builderSingle = new AlertDialog.Builder(MainActivity.this);
@@ -420,61 +437,85 @@ public class MainActivity extends AppCompatActivity
 
             builderSingle.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialog, final int which) {
-                    String strName = arrayAdapter.getItem(which);
-                   Uri filepathuri = data.getData();
-                    StorageReference mstore= FirebaseStorage.getInstance().getReference();
-                    Bitmap compress=null;
+                public void onClick(final DialogInterface dialog, final int which) {
+                    final String strName = arrayAdapter.getItem(which);
+                   final Uri filepathuri = data.getData();
+                    final StorageReference[] mstore = {FirebaseStorage.getInstance().getReference()};
+                    final Bitmap[] compress = {null};
+
                    final ProgressDialog mDialog=new ProgressDialog(MainActivity.this);
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                   if(requestCode==9) {
-                       compress = (Bitmap) data.getExtras().get("data");
-                       compress.compress(Bitmap.CompressFormat.JPEG, 90, baos);
-                   }
-                   else {
-                       try {
-                           compress = MediaStore.Images.Media.getBitmap(getContentResolver(), filepathuri);
-                           compress.compress(Bitmap.CompressFormat.JPEG, 50, baos);
-                       } catch (IOException e) {
-                           e.printStackTrace();
-                       }
-                   }
-
-
-
-                    byte[] data1 = baos.toByteArray();
-
-                    mstore=mstore.child("images").child(strName);
-                    mstore = mstore.child(push());
-                    mstore.putBytes(data1).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                   final AlertDialog.Builder abuilder=new AlertDialog.Builder(MainActivity.this);
+                    final EditText caption=new EditText(MainActivity.this);
+                    abuilder.setView(caption).setTitle("Enter a Caption:");
+                    abuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            @SuppressWarnings("VisibleForTests") final Uri dnldurl=taskSnapshot.getDownloadUrl();
-                            String s= Calendar.getInstance().getTime().toString();
-                            DatabaseReference newpost=mdatabase.child("Gallery").push();
-                            newpost.child("url").setValue(dnldurl.toString());
-                            newpost.child("date").setValue(s);
-                            s=newpost.getKey();
-                            newpost=mdatabase.child("Events").child(Events.get(which)).child("Gallery").push();
-                            newpost.setValue(s);
-                            Toast.makeText(MainActivity.this,"Image Uploaded Succesfully",
-                                    Toast.LENGTH_SHORT).show();
-                            mDialog.dismiss();
+                        public void onClick(DialogInterface dialogInterface2, int i) {
+                            final String s3=caption.getText().toString();
+                            if(s3.isEmpty()) {
+                                dialogInterface2.dismiss();
+                                dialog.dismiss();
+
+                            }
+
+                            else {
+
+
+                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                if (requestCode == 9) {
+                                    compress[0] = (Bitmap) data.getExtras().get("data");
+                                    compress[0].compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                                } else {
+                                    try {
+                                        compress[0] = MediaStore.Images.Media.getBitmap(getContentResolver(), filepathuri);
+                                        compress[0].compress(Bitmap.CompressFormat.JPEG, 50, baos);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
+
+                                byte[] data1 = baos.toByteArray();
+
+                                mstore[0] = mstore[0].child("images").child(strName);
+                                mstore[0] = mstore[0].child(push());
+                                mstore[0].putBytes(data1).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                    @Override
+                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                        @SuppressWarnings("VisibleForTests") final Uri dnldurl = taskSnapshot.getDownloadUrl();
+                                        String s = Calendar.getInstance().getTime().toString();
+                                        DatabaseReference newpost = mdatabase.child("Gallery").push();
+                                        newpost.child("url").setValue(dnldurl.toString());
+                                        newpost.child("date").setValue(s);
+                                        newpost.child("captn").setValue(s3);
+                                        s = newpost.getKey();
+                                        newpost = mdatabase.child("Events").child(Events.get(which)).child("Gallery").push();
+                                        newpost.setValue(s);
+                                        Toast.makeText(MainActivity.this, "Image Uploaded Succesfully",
+                                                Toast.LENGTH_SHORT).show();
+                                        mDialog.dismiss();
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(MainActivity.this, "Uploadation Failed", Toast.LENGTH_SHORT).show();
+                                        mDialog.dismiss();
+                                    }
+                                });
+                            }
+                    //here
                         }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(MainActivity.this,"Uploadation Failed",Toast.LENGTH_SHORT).show();
-                            mDialog.dismiss();
-                        }
-                    });
+                    });abuilder.show();
 
                 }
 
                 private String push() {
                    return  UUID.randomUUID().toString();
                 }
+
+
             });
+
+
             builderSingle.show();
         }
     }
@@ -488,16 +529,42 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public boolean isViewFromObject(View view, Object object) {
-                return (view ==(ImageView)object);
+                return (view ==(RelativeLayout)object);
             }
 
             @Override
             public Object instantiateItem(final ViewGroup container, final int position) {
                 final ImageView IM= new ImageView(MainActivity.this);
-                IM.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT));
-                IM.setScaleType(ImageView.ScaleType.CENTER);
 
+                RelativeLayout rLayout = new RelativeLayout(MainActivity.this);
+                ViewGroup.LayoutParams rlParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT
+                        , ViewGroup.LayoutParams.FILL_PARENT);
+
+
+                rLayout.setLayoutParams(rlParams);
+
+                IM.setLayoutParams(rlParams);
+                IM.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                IM.setImageResource(Array[position]);
+
+                RelativeLayout.LayoutParams tParams = new RelativeLayout.LayoutParams
+                        (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                tParams.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+                tParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+
+                TextView text=new TextView(MainActivity.this);
+                text.setTextSize(30);
+                text.setText(string[position]);
+                text.setTextColor(getResources().getColor(R.color.cardview_light_background));
+                text.setBackgroundColor(getResources().getColor(R.color.trans_black));
+                text.setTypeface(Typeface.defaultFromStyle(Typeface.ITALIC));
+                text.setLayoutParams(tParams);
+
+                rLayout.addView(IM);
+                rLayout.addView(text);
+
+
+                /*
                 Picasso.with(MainActivity.this).load(images.get(position)).networkPolicy(NetworkPolicy.OFFLINE)
                         .into(IM, new Callback() {
                             @Override
@@ -510,25 +577,23 @@ public class MainActivity extends AppCompatActivity
                                 Picasso.with(MainActivity.this).load(images.get(position)).into(IM);
                             }
                         });
-                container.addView(IM);
+                        */
+                container.addView(rLayout);
 
-                if(IM.getParent()!=null) {
-                    ((ViewGroup) IM.getParent()).removeView(IM);
-                }
-                    return IM;
+                    return rLayout;
             }
 
             @Override
             public void destroyItem(ViewGroup container, int position, Object object) {
                 //  super.destroyItem(container, position, object);
-                container.removeView((ImageView)object);
+                container.removeView((RelativeLayout)object);
             }
 
 
             @Override
             public int getCount() {
 
-                return 0;
+                return 5;
 
             }
         });
@@ -537,6 +602,7 @@ public class MainActivity extends AppCompatActivity
         viewPager.setSlideInterval(3000);
         viewPager.setCycle(true);
         viewPager.setSlideDuration(1500);
+
         rv.setAdapter(new RecyclerView.Adapter<RecyclerViewHolder>() {
             @Override
             public RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -549,18 +615,24 @@ public class MainActivity extends AppCompatActivity
                 mdatabase.child("Events").child(Events.get(position)).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                       cA.setName(dataSnapshot.getValue(CommonAdapter.class).getName());
-                       holder.setName(cA.getName());
-                        cA.setImage(dataSnapshot.getValue(CommonAdapter.class).getImage());
-                        holder.setImage(MainActivity.this, cA.getImage());
-                        holder.mview.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                Intent i = new Intent(MainActivity.this, EventDetail.class);
-                                i.putExtra("key", Events.get(position));
-                                startActivity(i);
-                            }
-                        });
+                        try {
+                            cA.setName(dataSnapshot.getValue(CommonAdapter.class).getName());
+                            holder.setName(cA.getName());
+                            cA.setImage(dataSnapshot.getValue(CommonAdapter.class).getImage());
+                            holder.setImage(MainActivity.this, cA.getImage());
+                            holder.mview.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Intent i = new Intent(MainActivity.this, EventDetail.class);
+                                    i.putExtra("key", Events.get(position));
+                                    startActivity(i);
+                                }
+                            });
+                        }
+                        catch (NullPointerException e)
+                        {
+
+                        }
 
                     }
 
@@ -583,4 +655,10 @@ public class MainActivity extends AppCompatActivity
         rv.getAdapter().notifyDataSetChanged();
     }
 
-}
+            @Override
+            protected void onResume() {
+                super.onResume();
+                rv.getAdapter().notifyDataSetChanged();
+                viewPager.getAdapter().notifyDataSetChanged();
+            }
+        }
