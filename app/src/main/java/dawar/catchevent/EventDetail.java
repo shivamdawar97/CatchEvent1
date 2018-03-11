@@ -1,5 +1,6 @@
 package dawar.catchevent;
 
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -33,6 +34,7 @@ public class EventDetail extends AppCompatActivity {
     FirebaseAuth mAuth;
     FirebaseUser muser;
     CommonAdapter ca;
+    String imageurl;
     TextView title,regfee,date,time,desc;
     View layout;
     String s;
@@ -73,7 +75,8 @@ public class EventDetail extends AppCompatActivity {
                     android.support.v7.app.ActionBar actionBar = getSupportActionBar();
                     actionBar.setTitle(s);
                     actionBar.setDisplayHomeAsUpEnabled(true);
-                    Picasso.with(EventDetail.this).load(dataSnapshot.child("image").getValue().toString()).into(imageView);
+                    imageurl=dataSnapshot.child("image").getValue().toString();
+                    Picasso.with(EventDetail.this).load(imageurl).into(imageView);
                     date.setText(" DATE :" + dataSnapshot.child("date").getValue());
                     date.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_date_range_black_24dp, 0, 0, 0);
                     time.setText(" Timings :" + dataSnapshot.child("time").getValue().toString() +
@@ -180,11 +183,11 @@ public class EventDetail extends AppCompatActivity {
         Intent i=new Intent(EventDetail.this,GalleryActivity.class);
             if(view.getId()==R.id.gal_btn){
                 i.putExtra("view",1);
-                i.putExtra("name",s+">>Gallery");
+                i.putExtra("name",s);
             }
             else {
                 i.putExtra("view", 2);
-                i.putExtra("name",s+">>Alerts");
+                i.putExtra("name",s);
             }
         i.putExtra("key",keyID);
 
@@ -192,4 +195,13 @@ public class EventDetail extends AppCompatActivity {
         startActivity(i);
     }
 
+    public void enlargeIt(View view) {
+        android.support.v4.app.FragmentTransaction transaction=getSupportFragmentManager().beginTransaction().addToBackStack(null);
+        Bundle b=new Bundle();
+        b.putInt("pos",-3);
+        b.putString("img",imageurl);
+        Image_slider im=new Image_slider();
+        im.setArguments(b);
+        transaction.replace(R.id.detailcontent,im).commit();
+    }
 }

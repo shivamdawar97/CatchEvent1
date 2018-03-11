@@ -12,6 +12,7 @@
     <ImageView
         android:id="@+id/imageView2"
         android:layout_width="382dp"
+        android:onClick="enlargeIt"
         android:layout_height="169dp"
         android:contentDescription="@string/event_image"
         app:layout_constraintBottom_toTopOf="@+id/event_title"

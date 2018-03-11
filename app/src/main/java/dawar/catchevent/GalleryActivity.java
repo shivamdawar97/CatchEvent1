@@ -101,9 +101,17 @@ public class GalleryActivity extends AppCompatActivity {
         keyID=getIntent().getStringExtra("name");
         android.support.v7.app.ActionBar actionBar=getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
+        t=getIntent().getIntExtra("view",3);
+        if(t==1){
+            keyID=keyID+">>Gallery";
+        }
+
+        if(t==2){
+            keyID=keyID+">>Alerts";
+        }
         actionBar.setTitle(keyID);
 
-        t=getIntent().getIntExtra("view",3);
+
         ftb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

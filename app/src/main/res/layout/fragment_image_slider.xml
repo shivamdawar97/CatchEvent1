@@ -1,13 +1,15 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/slider_relative"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="dawar.catchevent.Image_slider">
+
     <android.support.v4.view.ViewPager
         android:id="@+id/gal_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/common_google_signin_btn_text_light_default" >
+        android:background="@color/common_google_signin_btn_text_light_default">
 
     </android.support.v4.view.ViewPager>
 
@@ -25,10 +27,10 @@
         android:id="@+id/caption"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
         android:layout_above="@+id/idate"
         android:layout_alignParentStart="true"
         android:background="@color/trans_black"
+        android:gravity="center"
         android:text="Caption"
         android:textColor="@color/cardview_light_background"
         android:textSize="25sp" />
@@ -41,11 +43,10 @@
         android:layout_alignParentStart="true"
         android:layout_marginBottom="96dp"
         android:background="@color/trans_black"
-        android:text="Date"
         android:gravity="center"
+        android:text="Date"
         android:textColor="@color/cardview_light_background"
         android:textSize="17sp" />
-
 
 
 </RelativeLayout>

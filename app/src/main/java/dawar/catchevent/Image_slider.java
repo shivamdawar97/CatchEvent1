@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 public class Image_slider extends Fragment {
 
         private int pos;
+        RelativeLayout relativeLayout;
         private ViewPager viewPager;
         private ArrayList<String> dates;
         private ArrayList<String> images,captns;
@@ -43,6 +45,7 @@ public class Image_slider extends Fragment {
         dateview=view.findViewById(R.id.idate);
         counts=view.findViewById(R.id.lbl_count);
         captn=view.findViewById(R.id.caption);
+        relativeLayout=view.findViewById(R.id.slider_relative);
 
         pos=getArguments().getInt("pos");
         if(pos!=-1) {
@@ -51,7 +54,7 @@ public class Image_slider extends Fragment {
             captns = getArguments().getStringArrayList("cts");
 
         }
-        else {
+        else if(pos==-1) {
             dates=new ArrayList<>();
             images=new ArrayList<>();
             captns=new ArrayList<>();
@@ -70,56 +73,71 @@ public class Image_slider extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+            if(pos!=-3) {
+                viewPager.setAdapter(new PagerAdapter() {
+                    @Override
+                    public int getCount() {
+                        return images.size();
+                    }
 
-            viewPager.setAdapter(new PagerAdapter() {
-                @Override
-                public int getCount() {
-                    return images.size();
-                }
+                    @Override
+                    public boolean isViewFromObject(View view, Object object) {
+                        return (view == (ImageView) object);
+                    }
 
-                @Override
-                public boolean isViewFromObject(View view, Object object) {
-                    return (view == (ImageView) object);
-                }
-
-                @Override
-                public Object instantiateItem(ViewGroup container, final int position) {
-                    final ImageView IM = new ImageView(getContext());
-                    IM.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.MATCH_PARENT));
-                    Picasso.with(getContext()).load(images.get(position)).networkPolicy(NetworkPolicy.OFFLINE).into(IM);
-                    container.addView(IM);
+                    @Override
+                    public Object instantiateItem(ViewGroup container, final int position) {
+                        final ImageView IM = new ImageView(getContext());
+                        IM.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.MATCH_PARENT));
+                        Picasso.with(getContext()).load(images.get(position)).networkPolicy(NetworkPolicy.OFFLINE).into(IM);
+                        container.addView(IM);
 //                notifyDataSetChanged();
-                    return IM;
-                }
+                        return IM;
+                    }
 
-                @Override
-                public void destroyItem(ViewGroup container, int position, Object object) {
+                    @Override
+                    public void destroyItem(ViewGroup container, int position, Object object) {
 
 //                super.destroyItem(container, position, object);
-                    container.removeView((ImageView) object);
-                }
-            });
-            viewPager.setCurrentItem(pos);
-            viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-                @Override
-                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                    counts.setText("" + (position + 1) + "/" + dates.size());
-                    dateview.setText(dates.get(position));
-                    captn.setText(captns.get(position));
-                }
+                        container.removeView((ImageView) object);
+                    }
+                });
+                viewPager.setCurrentItem(pos);
+                viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                    @Override
+                    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                        counts.setText("" + (position + 1) + "/" + dates.size());
+                        dateview.setText(dates.get(position));
+                        captn.setText(captns.get(position));
+                    }
 
-                @Override
-                public void onPageSelected(int position) {
+                    @Override
+                    public void onPageSelected(int position) {
 
 
-                }
+                    }
 
-                @Override
-                public void onPageScrollStateChanged(int state) {
+                    @Override
+                    public void onPageScrollStateChanged(int state) {
 
-                }
-            });
+                    }
+                });
+            }
+            else
+
+
+            {
+                dateview.setVisibility(View.INVISIBLE);
+                counts.setVisibility(View.INVISIBLE);
+                captn.setVisibility(View.INVISIBLE);
+                String s=getArguments().getString("img");
+                final ImageView IM = new ImageView(getContext());
+                IM.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT));
+                Picasso.with(getContext()).load(s).networkPolicy(NetworkPolicy.OFFLINE).into(IM);
+                relativeLayout.addView(IM);
+            }
         }
 
 }

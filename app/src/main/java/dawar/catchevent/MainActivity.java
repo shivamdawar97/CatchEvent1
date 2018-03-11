@@ -76,6 +76,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.UUID;
@@ -188,7 +189,7 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            finish();
         }
     }
 
@@ -461,20 +462,25 @@ public class MainActivity extends AppCompatActivity
 
 
                                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                byte[] data1 = new byte[0];
+
                                 if (requestCode == 9) {
                                     compress[0] = (Bitmap) data.getExtras().get("data");
                                     compress[0].compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                                    data1=baos.toByteArray();
+
                                 } else {
                                     try {
                                         compress[0] = MediaStore.Images.Media.getBitmap(getContentResolver(), filepathuri);
                                         compress[0].compress(Bitmap.CompressFormat.JPEG, 50, baos);
+                                        data1= baos.toByteArray();
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
                                 }
 
-
-                                byte[] data1 = baos.toByteArray();
+                                    
+                                 
 
                                 mstore[0] = mstore[0].child("images").child(strName);
                                 mstore[0] = mstore[0].child(push());

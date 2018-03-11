@@ -42,6 +42,7 @@ public class AlertDetails extends AppCompatActivity {
         setContentView(R.layout.activity_alert_details);
         t1=findViewById(R.id.al_ttl_view);
         t2=findViewById(R.id.al_dsc_view);
+        t2.setFocusable(false);
         t3=findViewById(R.id.al_rel_view);
         t4=findViewById(R.id.al_date_);
         al_rv=findViewById(R.id.al_rec_view);

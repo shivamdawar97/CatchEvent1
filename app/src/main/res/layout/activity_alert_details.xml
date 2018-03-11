@@ -23,11 +23,22 @@
         android:id="@+id/al_date_"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:text="TextView"
+        android:layout_marginTop="35dp"
         android:gravity="left"
         android:textSize="16sp"
         app:layout_constraintEnd_toStartOf="@+id/al_ttl_view"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="70dp"
+        android:text="Description:"
+        android:textColor="@color/colorPrimary"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@+id/al_date_"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -35,11 +46,11 @@
         android:id="@+id/al_dsc_view"
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        android:layout_marginTop="15dp"
-        android:gravity="center"
+        android:layout_marginTop="30dp"
+        android:gravity="left"
         android:scrollbars="vertical"
-        android:textSize="12sp"
         android:text="@string/det_description_about_event"
+        android:textSize="12sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/al_ttl_view" />
