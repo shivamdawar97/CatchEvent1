@@ -1,13 +1,43 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/frag_ubv"
+    android:background="@drawable/frag_back"
     tools:context="dawar.catchevent.UdbhavFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <ImageView
+        android:id="@+id/imageView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="300dp"
+        android:layout_above="@+id/tap_button"
+        android:src="@drawable/udbhav_icon"
+        android:layout_alignParentStart="true"
+         />
 
-</FrameLayout>
+    <Button
+        android:id="@+id/tap_button"
+        android:layout_width="250dp"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="39dp"
+        android:background="@color/colorAccent"
+        android:text="Tap Anywhere to Enter"
+        android:textColor="@color/cardview_light_background"
+        android:textSize="20sp"
+        android:textStyle="italic" />
+
+    <TextView
+        android:id="@+id/udbhav_text"
+        android:layout_width="300dp"
+        android:layout_height="100dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:text="Udbhav\n2018"
+        android:textColor="@color/cardview_light_background"
+        android:textSize="43sp"
+        android:textStyle="italic" />
+
+</RelativeLayout>

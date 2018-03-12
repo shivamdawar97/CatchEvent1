@@ -401,6 +401,10 @@ public class MainActivity extends AppCompatActivity
             });
 
         }
+       public void setImagefromSrc(int src){
+           final ImageView im=mview.findViewById(R.id.event_image);
+           im.setImageResource(src);
+        }
     }
 
     @Override
@@ -618,6 +622,10 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onBindViewHolder(final RecyclerViewHolder holder, final int position) {
+
+
+
+                /*
                 mdatabase.child("Events").child(Events.get(position)).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -647,14 +655,23 @@ public class MainActivity extends AppCompatActivity
 
                     }
                 });
+                    */
 
+               holder.setImagefromSrc(R.drawable.udbhav_icon);
+                holder.setName("Udbhav 2018");
+                holder.mview.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        startActivity(new Intent(MainActivity.this,UdbhavMainActivity.class));
+                    }
+                });
             }
 
 
             @Override
             public int getItemCount() {
 
-                return Events.size();
+                return 1;
             }
         });
         rv.setLayoutManager(new LinearLayoutManager(MainActivity.this));

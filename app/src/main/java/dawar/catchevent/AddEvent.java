@@ -1,6 +1,7 @@
 package dawar.catchevent;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,7 +21,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.ClientCertRequest;
+import android.widget.Adapter;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -58,6 +62,7 @@ public class AddEvent extends AppCompatActivity {
         setSupportActionBar(toolbar);
         mStorageRef= FirebaseStorage.getInstance().getReference();
         mDatabaseRef= FirebaseDatabase.getInstance().getReference();
+
         imageView=findViewById(R.id.add_event_image);
        // View view=getLayoutInflater().inflate(R.layout.content_add_event,null);
         pd= new ProgressDialog(this);
@@ -86,6 +91,62 @@ public class AddEvent extends AppCompatActivity {
                 return false;
             }
         });
+
+        final AlertDialog.Builder alert =new AlertDialog.Builder(this);
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice);
+        alert.setTitle("Select One:-");
+
+        arrayAdapter.add("Udbhav");
+        arrayAdapter.add("Spardha");
+        arrayAdapter.add("Other");
+
+        alert.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        alert.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                switch (i){
+                    case 0:
+                        boolean ch;
+                        AlertDialog.Builder builder2=new AlertDialog.Builder(AddEvent.this);
+                        arrayAdapter.clear();
+                        arrayAdapter.add("Day1");
+                        arrayAdapter.add("Day2");
+                        arrayAdapter.add("Day3");
+                        builder2.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        });
+                        CheckBox checkBox=new CheckBox(AddEvent.this);
+                        checkBox.setText("Is it a Special Event");
+                        builder2.setView(checkBox);
+                        builder2.setPositiveButton("Add Event", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Toast.makeText(AddEvent.this,"You selected "+arrayAdapter.getItem(i),Toast.LENGTH_SHORT ).show();
+                            }
+                        });
+                            builder2.show();
+                        break;
+                    case 1:
+
+                        break;
+
+                    case 2:
+                        break;
+
+
+                }
+            }
+        });
+        alert.show();
     }
 
 

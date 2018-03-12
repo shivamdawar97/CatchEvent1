@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentActivity;
 import android.text.InputType;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
@@ -22,6 +23,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -36,12 +38,10 @@ public  class CommonAdapter  {
     private static int  RC_SIGN_IN = 10;
     private String name;
     private String image;
-    private String gimage;
     FirebaseAuth mAuth;
     String m_Text;
     private GoogleApiClient mgoogleApiClient;
     Context ctx;
-    private boolean b;
 
 
     public CommonAdapter(final Context ctx,FirebaseAuth mAuth){
@@ -90,24 +90,52 @@ public  class CommonAdapter  {
                 m_Text = input.getText().toString();
                 if (m_Text.equals("54321")) {
 
-                   GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                                .requestIdToken(ctx.getString(R.string.default_web_client_id))
-                                .requestEmail()
-                                .build();
+                    AlertDialog.Builder builder1=new AlertDialog.Builder(ctx);
+                    builder1.setMessage("Enter Username and Password");
 
-                    mgoogleApiClient=new GoogleApiClient.Builder(ctx.getApplicationContext())
-                            .enableAutoManage( (FragmentActivity)ctx, new GoogleApiClient.OnConnectionFailedListener() {
+                    LinearLayout layout = new LinearLayout(ctx);
+                    layout.setOrientation(LinearLayout.VERTICAL);
+
+
+                    final EditText username=new EditText(ctx);
+                    username.setHint("Username");
+                    layout.addView(username);
+                    final EditText password=new EditText(ctx);
+                    password.setHint("Password");
+                    layout.addView(password);
+                    builder1.setView(layout);
+                    builder1.setPositiveButton("LogIn", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            final String us=username.getText().toString();
+                            final String pss=password.getText().toString();
+
+
+                            mAuth.signInWithEmailAndPassword(us,pss).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                 @Override
-                                public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                                    Toast.makeText(ctx,"LogIn Failed "+connectionResult.getErrorMessage(),Toast.LENGTH_SHORT).show();
-                                }
-                            }).addApi(Auth.GOOGLE_SIGN_IN_API,gso)
-                            .build();
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if(task.isSuccessful()){
+                                        Toast.makeText(ctx,"Signed In Successfully",Toast.LENGTH_SHORT).show();
 
-                    Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mgoogleApiClient);
-                    ((Activity)ctx).startActivityForResult(signInIntent, RC_SIGN_IN);
-                    mgoogleApiClient.stopAutoManage( ((FragmentActivity) ctx));
-                    mgoogleApiClient.disconnect();
+                                    }
+                                    else {
+                                        Toast.makeText(ctx,"Sign In Falied",Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+
+                            });
+
+
+                        }
+                    });
+
+
+
+                    builder1.show();
+
+
+
                 } else {
 
                     builder.setMessage("Wrong key");
@@ -131,34 +159,10 @@ public  class CommonAdapter  {
 
         if (i == RC_SIGN_IN) {
 
-            GoogleSignInResult task = Auth.GoogleSignInApi.getSignInResultFromIntent(intent);
-            // Google Sign In was successful, authenticate with Firebase
-            if(task.isSuccess()) {
-                GoogleSignInAccount account = task.getSignInAccount();
-                firebaseAuthWithGoogle(account);
-            }
-            else {
-                Toast.makeText(ctx,"LogIn Failed",Toast.LENGTH_SHORT).show();
-            }
+
+
         }
 
-
-    }
-    private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
-        AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
-        mAuth.signInWithCredential(credential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful()){
-                     Toast.makeText(ctx,"Logged In successfully",Toast.LENGTH_SHORT).show();
-                    b =true;
-                }
-                else {
-                    b=false;
-                }
-
-            }
-        });
 
     }
 
