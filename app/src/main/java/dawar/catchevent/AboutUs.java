@@ -48,7 +48,7 @@ public class AboutUs extends AppCompatActivity {
         }
         else {
             ActionBar actionBar=getSupportActionBar();
-            actionBar.setTitle("Send Feddback");
+            actionBar.setTitle("Send Feedback");
             tv.setTextSize(20);
         }
 

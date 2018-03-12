@@ -122,7 +122,7 @@ public class ListActivity extends AppCompatActivity {
                else{
                     switch (t){
                         case 0:
-                            Toast.makeText(ListActivity.this,"This feature will be added soon",Toast.LENGTH_SHORT);
+                            Toast.makeText(ListActivity.this,"This feature will be added soon",Toast.LENGTH_SHORT).show();
                             break;
                         case 1:
                             Intent add=new Intent(ListActivity.this,AddAlerts.class);
@@ -251,7 +251,7 @@ public class ListActivity extends AppCompatActivity {
                                 ab.show();
                                 break;
                         case 3:
-                            Toast.makeText(ListActivity.this,"This feature will be added soon",Toast.LENGTH_SHORT);
+                            Toast.makeText(ListActivity.this,"This feature will be added soon",Toast.LENGTH_SHORT).show();
                                 break;
 
                     }
