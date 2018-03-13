@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="dawar.catchevent.AddEvent"
+
     tools:showIn="@layout/activity_add_event">
 
 
@@ -63,14 +64,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="@string/date_of_event_dd_mm_yy"
-                android:inputType="date" />
+                android:inputType="text" />
 
             <EditText
                 android:id="@+id/event_timings"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="@string/timings_hh_mm_am_pm"
-                android:inputType="time" />
+                android:inputType="text" />
 
             <EditText
                 android:id="@+id/event_venue"
@@ -86,28 +87,28 @@
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="Registration Fee(if any)"
-                android:inputType="number" />
+                android:inputType="text" />
 
             <EditText
                 android:id="@+id/fst_prize"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="1st Prize(if any)"
-                android:inputType="number" />
+                android:inputType="text" />
 
             <EditText
                 android:id="@+id/snd_prize"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="2nd Prize(if any)"
-                android:inputType="number" />
+                android:inputType="text" />
 
             <EditText
                 android:id="@+id/thrd_prize"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="3rd Prize(if any)"
-                android:inputType="number" />
+                android:inputType="text" />
             <EditText
                 android:id="@+id/event_desc"
                 android:layout_width="match_parent"

@@ -15,7 +15,7 @@ import android.widget.RelativeLayout;
  */
 public class UdbhavFragment extends Fragment {
 
-    RelativeLayout button;
+    RelativeLayout relativeLayout;
     public UdbhavFragment() {
         // Required empty public constructor
     }
@@ -28,8 +28,8 @@ public class UdbhavFragment extends Fragment {
         // Inflate the layout for this fragment
 
         View view=inflater.inflate(R.layout.fragment_udbhav, container, false);
-        button=view.findViewById(R.id.frag_ubv);
-        button.setOnClickListener(new View.OnClickListener() {
+        relativeLayout=view.findViewById(R.id.frag_ubv);
+        relativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 getActivity().onBackPressed();

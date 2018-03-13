@@ -412,7 +412,7 @@ public class MainActivity extends AppCompatActivity
         if(requestCode==10)
         cA.onActivityOfResult(requestCode, resultCode, data);
 
-        if((requestCode==9 || requestCode==8) && data!=null && data.getExtras()!=null){
+        if((requestCode==9 || requestCode==8) && data!=null ){
 
 
             AlertDialog.Builder builderSingle = new AlertDialog.Builder(MainActivity.this);
@@ -468,7 +468,7 @@ public class MainActivity extends AppCompatActivity
                                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                                 byte[] data1 = new byte[0];
 
-                                if (requestCode == 9) {
+                                if (requestCode == 9 && data.getExtras()!=null) {
                                     compress[0] = (Bitmap) data.getExtras().get("data");
                                     compress[0].compress(Bitmap.CompressFormat.JPEG, 100, baos);
                                     data1=baos.toByteArray();

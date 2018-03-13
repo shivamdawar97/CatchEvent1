@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -33,11 +34,13 @@ public class EventDetail extends AppCompatActivity {
     ImageView im;
     FirebaseAuth mAuth;
     FirebaseUser muser;
+    EditText fst,snd,thd;
     CommonAdapter ca;
     String imageurl;
     TextView title,regfee,date,time,desc;
     View layout;
     String s;
+    Button b;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,11 +56,22 @@ public class EventDetail extends AppCompatActivity {
         title=findViewById(R.id.event_title);
         regfee=findViewById(R.id.RegistrationFee);
         date=findViewById(R.id.Date);
+        fst=findViewById(R.id.rs_fst);
+        snd=findViewById(R.id.rs_snd);
+        thd=findViewById(R.id.rs_thd);
+        b=findViewById(R.id.rs_bttn);
         time=findViewById(R.id.Timings);
         desc=findViewById(R.id.desc);
         mdata= FirebaseDatabase.getInstance().getReference();
         keyID=getIntent().getStringExtra("key");
         populate(keyID,im);
+
+        if(muser==null ){
+            fst.setFocusable(false);
+            snd.setFocusable(false);
+            thd.setFocusable(false);
+            b.setVisibility(View.INVISIBLE);
+        }
 
     }
 
@@ -100,6 +114,18 @@ public class EventDetail extends AppCompatActivity {
                     if (dataSnapshot.hasChild("thrdpz")) {
                         newtext = dataSnapshot.child("thrdpz").getValue().toString();
                         regfee.append("\n Third Prize : " + newtext);
+                    }
+                    if(dataSnapshot.hasChild("rs_fst")){
+                        newtext =dataSnapshot.child("rs_fst").getValue().toString();
+                        fst.setText(newtext);
+                    }
+                    if(dataSnapshot.hasChild("rs_snd")){
+                        newtext =dataSnapshot.child("rs_snd").getValue().toString();
+                        snd.setText(newtext);
+                    }
+                    if(dataSnapshot.hasChild("rs_thd")){
+                        newtext =dataSnapshot.child("rs_thd").getValue().toString();
+                        thd.setText(newtext);
                     }
                 }
                 catch (NullPointerException e){
@@ -168,6 +194,8 @@ public class EventDetail extends AppCompatActivity {
                 Snackbar.make(layout, "You are not Logged In", Snackbar.LENGTH_LONG).setAction("Action", null).show();
 
             }
+            finish();
+            startActivity(getIntent());
 
         }
         return super.onOptionsItemSelected(item);
@@ -203,5 +231,18 @@ public class EventDetail extends AppCompatActivity {
         Image_slider im=new Image_slider();
         im.setArguments(b);
         transaction.replace(R.id.detailcontent,im).commit();
+    }
+
+    public void updateResults(View view) {
+        String s1,s2,s3;
+        s1=fst.getText().toString();
+        s2=snd.getText().toString();
+        s3=thd.getText().toString();
+
+        if(!s1.isEmpty() && !s2.isEmpty() && !s3.isEmpty()) {
+            mdata.child("Events").child(keyID).child("rs_fst").setValue(s1);
+            mdata.child("Events").child(keyID).child("rs_snd").setValue(s2);
+            mdata.child("Events").child(keyID).child("rs_thd").setValue(s3);
+        }
     }
 }

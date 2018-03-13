@@ -49,6 +49,8 @@ public class AddEvent extends AppCompatActivity {
     EditText ed1,ed2,ed3,ed4,ed5,ed6,ed7,ed8,ed9;
     private Uri filepath;
     public static final int PICK=234;
+    private String U1,U2;
+    int cl,ch;//is cl for parent event (Udbhav/Spardha) and ch-->is for whether it is a special event or not
     private StorageReference mStorageRef;
     private ProgressDialog pd;
     DatabaseReference mDatabaseRef;
@@ -93,6 +95,7 @@ public class AddEvent extends AppCompatActivity {
         });
 
         final AlertDialog.Builder alert =new AlertDialog.Builder(this);
+        alert.setCancelable(false);
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice);
         alert.setTitle("Select One:-");
 
@@ -110,30 +113,36 @@ public class AddEvent extends AppCompatActivity {
         alert.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+               cl=i;
                 switch (i){
                     case 0:
-                        boolean ch;
+
+                        U1=arrayAdapter.getItem(i);
                         AlertDialog.Builder builder2=new AlertDialog.Builder(AddEvent.this);
+                        builder2.setCancelable(false);
                         arrayAdapter.clear();
                         arrayAdapter.add("Day1");
                         arrayAdapter.add("Day2");
                         arrayAdapter.add("Day3");
-                        builder2.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-
-                            }
-                        });
-                        CheckBox checkBox=new CheckBox(AddEvent.this);
+                        final CheckBox checkBox=new CheckBox(AddEvent.this);
                         checkBox.setText("Is it a Special Event");
                         builder2.setView(checkBox);
-                        builder2.setPositiveButton("Add Event", new DialogInterface.OnClickListener() {
+                        builder2.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                Toast.makeText(AddEvent.this,"You selected "+arrayAdapter.getItem(i),Toast.LENGTH_SHORT ).show();
+                            public void onClick(DialogInterface dialogInterface, int i2) {
+                                            U2=arrayAdapter.getItem(i2);
+                                            boolean p=checkBox.isChecked();
+                                            if(p){
+                                                ch=1;
+                                            }
+                                            else {
+                                                ch=0;
+                                            }
                             }
                         });
+
                             builder2.show();
+
                         break;
                     case 1:
 
@@ -147,6 +156,7 @@ public class AddEvent extends AppCompatActivity {
             }
         });
         alert.show();
+
     }
 
 
@@ -211,6 +221,18 @@ public class AddEvent extends AppCompatActivity {
                     } if(!s8.equals("")){
                         newPost.child("thrdpz").setValue(s8);
                     }
+                    switch (cl){
+                        case 0:
+                            mDatabaseRef.child(U1).child(U2).push().setValue(newPost.getKey());
+                            if(ch==1)
+                                mDatabaseRef.child(U1).child("Special").push().setValue(newPost.getKey());
+                            break;
+                        case 1:
+                            break;
+                        case 3:
+                            break;
+                    }
+
 
                     pd.dismiss();
                     Toast.makeText(AddEvent.this,"Event Created",Toast.LENGTH_LONG).show();
