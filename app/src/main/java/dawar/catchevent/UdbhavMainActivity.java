@@ -1,26 +1,16 @@
 package dawar.catchevent;
-
-import android.app.ActionBar;
-import android.app.FragmentTransaction;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.transition.TransitionManager;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ExpandableListView;
-import android.widget.TextView;
+
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -95,8 +85,7 @@ public class UdbhavMainActivity extends AppCompatActivity {
             }
         });
 
-      //  android.support.v4.app.FragmentTransaction ft=getSupportFragmentManager().beginTransaction().addToBackStack(null);
-       // ft.replace(R.id.udv_main,new UdbhavFragment()).commit();
+
 
     }
     @Override
@@ -127,8 +116,14 @@ public class UdbhavMainActivity extends AppCompatActivity {
                mdata.child("Events").child(dataSnapshot.getValue().toString()).addValueEventListener(new ValueEventListener() {
                    @Override
                    public void onDataChange(DataSnapshot dataSnapshot) {
-                       Day1.add(0,dataSnapshot.child("name").getValue().toString());
-                       day1.add(0,dataSnapshot.getKey());
+                       try {
+                           Day1.add(0,dataSnapshot.child("name").getValue().toString());
+                           day1.add(0,dataSnapshot.getKey());
+                       }
+                       catch (NullPointerException e){
+
+                       }
+
                    }
 
                    @Override
@@ -166,8 +161,14 @@ public class UdbhavMainActivity extends AppCompatActivity {
                 mdata.child("Events").child(dataSnapshot.getValue().toString()).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        Day2.add(0,dataSnapshot.child("name").getValue().toString());
-                        day2.add(0,dataSnapshot.getKey());
+                        try {
+                            Day2.add(0,dataSnapshot.child("name").getValue().toString());
+                            day2.add(0,dataSnapshot.getKey());
+                        }
+                        catch (NullPointerException e){
+
+                        }
+
                     }
 
                     @Override
@@ -209,8 +210,14 @@ public class UdbhavMainActivity extends AppCompatActivity {
                 mdata.child("Events").child(dataSnapshot.getValue().toString()).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        Day3.add(0,dataSnapshot.child("name").getValue().toString());
-                        day3.add(0,dataSnapshot.getKey());
+                        try {
+                            Day3.add(0,dataSnapshot.child("name").getValue().toString());
+                            day3.add(0,dataSnapshot.getKey());
+                        }
+                        catch (NullPointerException e){
+
+                        }
+
                     }
 
                     @Override
@@ -252,8 +259,14 @@ public class UdbhavMainActivity extends AppCompatActivity {
                 mdata.child("Events").child(dataSnapshot.getValue().toString()).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        Special.add(0,dataSnapshot.child("name").getValue().toString());
-                        spl.add(0,dataSnapshot.getKey());
+                        try {
+                            Special.add(0,dataSnapshot.child("name").getValue().toString());
+                            spl.add(0,dataSnapshot.getKey());
+                        }
+                        catch (NullPointerException e){
+
+                        }
+
                     }
 
                     @Override

@@ -1,6 +1,7 @@
 package dawar.catchevent;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -32,7 +33,7 @@ public class UdbhavFragment extends Fragment {
         relativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getActivity().onBackPressed();
+                startActivity(new Intent(getActivity(),UdbhavMainActivity.class));
             }
         });
 

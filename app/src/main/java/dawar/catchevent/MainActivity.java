@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -93,6 +94,7 @@ public class MainActivity extends AppCompatActivity
     DatabaseReference mdatabase;
     int[] Array;
     String[] string;
+    android.support.v4.app.FragmentTransaction ft;
     ArrayList<String> Events;
    // ArrayList<String> images;
     CommonAdapter cA;
@@ -188,9 +190,15 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer =  findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else {
+        }
+        else if(ft == null){
             finish();
         }
+        else {
+            finish();
+            startActivity(getIntent());
+        }
+
     }
 
     @Override
@@ -662,7 +670,10 @@ public class MainActivity extends AppCompatActivity
                 holder.mview.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        startActivity(new Intent(MainActivity.this,UdbhavMainActivity.class));
+                        fab.setVisibility(View.INVISIBLE);
+                        ft=getSupportFragmentManager().beginTransaction().addToBackStack(null);
+                        ft.replace(R.id.main_content,new UdbhavFragment()).commit();
+
                     }
                 });
             }
