@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -90,6 +91,8 @@ public class GalleryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.gallery_toolbar);
+        setSupportActionBar(toolbar);
         ftb=findViewById(R.id.ftb);
         images=new ArrayList<>();
         dates=new ArrayList<>();
@@ -100,16 +103,23 @@ public class GalleryActivity extends AppCompatActivity {
         mDialog=new ProgressDialog(this);
         keyID=getIntent().getStringExtra("name");
         android.support.v7.app.ActionBar actionBar=getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        t=getIntent().getIntExtra("view",3);
-        if(t==1){
-            keyID=keyID+">>Gallery";
-        }
 
-        if(t==2){
-            keyID=keyID+">>Alerts";
+        try {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            t=getIntent().getIntExtra("view",3);
+            if(t==1){
+                keyID=keyID+">>Gallery";
+            }
+
+            if(t==2){
+                keyID=keyID+">>Alerts";
+            }
+            actionBar.setTitle(keyID);
+
         }
-        actionBar.setTitle(keyID);
+        catch (NullPointerException e){
+            e.printStackTrace();
+        }
 
 
         ftb.setOnClickListener(new View.OnClickListener() {
@@ -544,9 +554,7 @@ public class GalleryActivity extends AppCompatActivity {
 
         }
 
-        if(id== R.id.refresh){
-            imagerecycler.getAdapter().notifyDataSetChanged();
-        }
+
         return super.onOptionsItemSelected(item);
     }
     }

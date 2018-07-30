@@ -3,12 +3,20 @@ package dawar.catchevent;
 import android.*;
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.Application;
+import android.app.LoaderManager;
 import android.app.ProgressDialog;
+import android.content.AsyncTaskLoader;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.Loader;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -26,6 +34,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.test.mock.MockApplication;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -77,29 +86,37 @@ import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.UUID;
 
+import dawar.catchevent.LogInClasses.LogInActivity;
+
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener
-        {
+{
     RecyclerView rv;
     FirebaseUser muser;
-    String m_Text;
     AlertDialog.Builder builder;
-    AutoScrollViewPager viewPager;
     DatabaseReference mdatabase;
-    int[] Array;
-    String[] string;
+    Cursor cursor;
+    static SQLiteDatabase sdatabase;
+    DatabaseHelper databaseHelper;
     android.support.v4.app.FragmentTransaction ft;
+    ArrayList<String> titles;
     ArrayList<String> Events;
-   // ArrayList<String> images;
+    ArrayList<Bitmap> images;
     CommonAdapter cA;
     FloatingActionButton fab;
     private FirebaseAuth mAuth;
+    int i=0;
+    RecyclerAdapter recyclerAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,18 +124,24 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         builder = new AlertDialog.Builder(this);
         mAuth = FirebaseAuth.getInstance();
+
         Toolbar toolbar =  findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        viewPager=findViewById(R.id.vpager);
+
         cA = new CommonAdapter(MainActivity.this,mAuth);
+        titles=new ArrayList<>();
+        images=new ArrayList<>();
         Events=new ArrayList<>();
-       // images=new ArrayList<>();
-        m_Text=new String("");
-        Array= new int[]{R.drawable.events,R.drawable.techno,R.drawable.cultural,R.drawable.sports,
-        R.drawable.fun};
-        string= new String[]{"Hello","Techno","Cultural","Sports","Fun"};
+        databaseHelper=new DatabaseHelper(this,"Events",null,1);
+        sdatabase=databaseHelper.getReadableDatabase();
+        mdatabase=((CatchEvent)this.getApplication()).getMdatabase();
+
         rv=  findViewById(R.id.recycler_view);
-         fab =  findViewById(R.id.fab);
+        rv.setLayoutManager(new LinearLayoutManager(this));
+        recyclerAdapter=new RecyclerAdapter(this,titles,images,Events);
+        rv.setAdapter(recyclerAdapter);
+
+        fab =  findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -134,6 +157,8 @@ public class MainActivity extends AppCompatActivity
         if(mAuth.getCurrentUser() == null) {
             fab.setVisibility(View.INVISIBLE);
         }
+
+
         DrawerLayout drawer =  findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -142,46 +167,51 @@ public class MainActivity extends AppCompatActivity
 
        NavigationView navigationView =  findViewById(R.id.nav_view);
        navigationView.setNavigationItemSelectedListener(this);
-       mdatabase=FirebaseDatabase.getInstance().getReference();
-        mdatabase.keepSynced(true);
-        mdatabase.child("Events").addChildEventListener(new ChildEventListener() {
-            String p;
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                try {
-                    s = dataSnapshot.getKey();
-                    Events.add(0,s);
-                    p=dataSnapshot.child("image").getValue().toString();
-                    //images.add(p);
-                }
-                catch (NullPointerException e)
-                {}
 
-            }
+       getLoaderManager().initLoader(i,null,new LoaderCallbacks()).forceLoad();
+       i++;
 
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+     }
 
-            }
+     private void initiateFirebaseLoaders(){
+         mdatabase.child("Events").addChildEventListener(new ChildEventListener() {
+             @Override
+             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                 s=dataSnapshot.child("name").getValue().toString();
+                 if(titles==null || !titles.contains(s))
+                 {
+                     Log.i("Firebase ", "Reached Here " + s);
+                     String oneTitle=s;
+                     s = dataSnapshot.child("image").getValue().toString();
+                     Bundle bundle=new Bundle();
+                     bundle.putString("title",oneTitle);
+                     bundle.putString("url",s);
+                     bundle.putString("key",dataSnapshot.getKey());
+                     getLoaderManager().initLoader(i,bundle,new FirebaseCallbacks()).forceLoad();
+                     i++;
+                 }
+             }
 
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                Events.remove(dataSnapshot.getKey());
-                rv.getAdapter().notifyDataSetChanged();
-                //images.remove(p);
+             @Override
+             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
-            }
+             }
 
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+             @Override
+             public void onChildRemoved(DataSnapshot dataSnapshot) {
 
-            }
+             }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+             @Override
+             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
-            }
-        });
+             }
+
+             @Override
+             public void onCancelled(DatabaseError databaseError) {
+
+             }
+         });
 
      }
 
@@ -235,7 +265,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         if(id == R.id.action_login){
-                cA.signIn();
+            startActivity(new Intent(MainActivity.this, LogInActivity.class));
             return true;
         }
         if(id==R.id.action_logout){
@@ -254,10 +284,6 @@ public class MainActivity extends AppCompatActivity
             }
 
         }
-        if(id== R.id.refresh){
-            rv.getAdapter().notifyDataSetChanged();
-            viewPager.getAdapter().notifyDataSetChanged();
-        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -273,12 +299,11 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_camera) {
             // Handle the camera action
-            muser=mAuth.getCurrentUser();
-            if(muser==null){
-                Toast.makeText(MainActivity.this,"You are not Registered",Toast.LENGTH_SHORT).show();
+            muser = mAuth.getCurrentUser();
+            if (muser == null) {
+                Toast.makeText(MainActivity.this, "You are not Registered", Toast.LENGTH_SHORT).show();
 
-            }
-            else {
+            } else {
                 AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this);
                 ab.setTitle("Choose Image Source:");
                 ab.setPositiveButton("CAMERA", new DialogInterface.OnClickListener() {
@@ -293,7 +318,6 @@ public class MainActivity extends AppCompatActivity
                             startActivityForResult(cameraIntent, 9);
 
                         }
-
                     }
                 });
                 ab.setNegativeButton("GALLERY", new DialogInterface.OnClickListener() {
@@ -325,43 +349,38 @@ public class MainActivity extends AppCompatActivity
                 });
 
                 ab.show();
-
                 //here
             }
-        }
+        } else if (id == R.id.nav_gallery) {
 
-        else if (id == R.id.nav_gallery) {
-
-        intent=new Intent(this,GalleryActivity.class);
-        intent.putExtra("view",3);
-        intent.putExtra("name","Gallery");
-        startActivity(intent);
+            intent = new Intent(this, GalleryActivity.class);
+            intent.putExtra("view", 3);
+            intent.putExtra("name", "Gallery");
+            startActivity(intent);
 
         } else if (id == R.id.nav_Alerts) {
 
-            intent=new Intent(this,GalleryActivity.class);
-            intent.putExtra("view",4);
-            intent.putExtra("name","Alerts");
+            intent = new Intent(this, GalleryActivity.class);
+            intent.putExtra("view", 4);
+            intent.putExtra("name", "Alerts");
             startActivity(intent);
 
-        }  else if (id == R.id.nav_aboutus) {
-            intent=new Intent(MainActivity.this,AboutUs.class);
-            intent.putExtra("pg",1);
-            startActivity(intent );
-
+        } else if (id == R.id.nav_aboutus) {
+            intent = new Intent(MainActivity.this, AboutUs.class);
+            intent.putExtra("pg", 1);
+            startActivity(intent);
 
 
         } else if (id == R.id.nav_send_feedback) {
-            intent=new Intent(MainActivity.this,AboutUs.class);
-            intent.putExtra("pg",2);
-            startActivity(intent );
+            intent = new Intent(MainActivity.this, AboutUs.class);
+            intent.putExtra("pg", 2);
+            startActivity(intent);
         }
 
-        DrawerLayout drawer =  findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
             @Override
             public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -378,42 +397,8 @@ public class MainActivity extends AppCompatActivity
                 }
             }
 
-            public static class RecyclerViewHolder extends RecyclerView.ViewHolder{
-        View mview;
-        public RecyclerViewHolder(View itemView) {
-            super(itemView);
-            mview=itemView;
-        }
-        public  void setName(String evntname){
-            final TextView EGrpName= mview.findViewById(R.id.event_name);
-            EGrpName.setText(evntname);
-        }
-        public void setImage(final Context ctx, final String image)  {
-            final ProgressDialog   pd=new ProgressDialog(ctx);
-            pd.setTitle("Please wait...");
-            pd.show();
-            final ImageView im=mview.findViewById(R.id.event_image);
 
-            Picasso.with(ctx).load(image).networkPolicy(NetworkPolicy.OFFLINE)
-                    .into(im, new Callback() {
-                @Override
-                public void onSuccess() {
-                    pd.dismiss();
-                }
 
-                @Override
-                public void onError() {
-                    Picasso.with(ctx).load(image).into(im);
-                    pd.dismiss();
-                }
-            });
-
-        }
-       public void setImagefromSrc(int src){
-           final ImageView im=mview.findViewById(R.id.event_image);
-           im.setImageResource(src);
-        }
-    }
 
     @Override
     protected void onActivityResult(final int requestCode, int resultCode, final Intent data) {
@@ -427,19 +412,7 @@ public class MainActivity extends AppCompatActivity
             builderSingle.setTitle("Select One Name:-");
             final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.select_dialog_singlechoice);
 
-            for (String key: Events){
-               mdatabase.child("Events").child(key).addValueEventListener(new ValueEventListener() {
-                   @Override
-                   public void onDataChange(DataSnapshot dataSnapshot) {
-                       arrayAdapter.add(dataSnapshot.child("name").getValue().toString());
-                   }
-
-                   @Override
-                   public void onCancelled(DatabaseError databaseError) {
-
-                   }
-               });
-            }
+            arrayAdapter.addAll(titles);
 
             builderSingle.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
                 @Override
@@ -447,7 +420,6 @@ public class MainActivity extends AppCompatActivity
                     dialog.dismiss();
                 }
             });
-
             builderSingle.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(final DialogInterface dialog, final int which) {
@@ -455,7 +427,6 @@ public class MainActivity extends AppCompatActivity
                    final Uri filepathuri = data.getData();
                     final StorageReference[] mstore = {FirebaseStorage.getInstance().getReference()};
                     final Bitmap[] compress = {null};
-
                    final ProgressDialog mDialog=new ProgressDialog(MainActivity.this);
                    final AlertDialog.Builder abuilder=new AlertDialog.Builder(MainActivity.this);
                     final EditText caption=new EditText(MainActivity.this);
@@ -467,20 +438,14 @@ public class MainActivity extends AppCompatActivity
                             if(s3.isEmpty()) {
                                 dialogInterface2.dismiss();
                                 dialog.dismiss();
-
                             }
-
                             else {
-
-
                                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                                 byte[] data1 = new byte[0];
-
                                 if (requestCode == 9 && data.getExtras()!=null) {
                                     compress[0] = (Bitmap) data.getExtras().get("data");
                                     compress[0].compress(Bitmap.CompressFormat.JPEG, 100, baos);
                                     data1=baos.toByteArray();
-
                                 } else {
                                     try {
                                         compress[0] = MediaStore.Images.Media.getBitmap(getContentResolver(), filepathuri);
@@ -490,10 +455,6 @@ public class MainActivity extends AppCompatActivity
                                         e.printStackTrace();
                                     }
                                 }
-
-                                    
-                                 
-
                                 mstore[0] = mstore[0].child("images").child(strName);
                                 mstore[0] = mstore[0].child(push());
                                 mstore[0].putBytes(data1).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -523,176 +484,172 @@ public class MainActivity extends AppCompatActivity
                     //here
                         }
                     });abuilder.show();
-
                 }
-
                 private String push() {
                    return  UUID.randomUUID().toString();
                 }
-
-
             });
-
-
             builderSingle.show();
         }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-      //  Toast.makeText(MainActivity.this,"onStart Called",Toast.LENGTH_SHORT).show();
-
-        viewPager.setAdapter(new PagerAdapter() {
-
-            @Override
-            public boolean isViewFromObject(View view, Object object) {
-                return (view ==(RelativeLayout)object);
-            }
-
-            @Override
-            public Object instantiateItem(final ViewGroup container, final int position) {
-                final ImageView IM= new ImageView(MainActivity.this);
-
-                RelativeLayout rLayout = new RelativeLayout(MainActivity.this);
-                ViewGroup.LayoutParams rlParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT
-                        , ViewGroup.LayoutParams.FILL_PARENT);
-
-
-                rLayout.setLayoutParams(rlParams);
-
-                IM.setLayoutParams(rlParams);
-                IM.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                IM.setImageResource(Array[position]);
-
-                RelativeLayout.LayoutParams tParams = new RelativeLayout.LayoutParams
-                        (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                tParams.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-                tParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-
-                TextView text=new TextView(MainActivity.this);
-                text.setTextSize(30);
-                text.setText(string[position]);
-                text.setTextColor(getResources().getColor(R.color.cardview_light_background));
-                text.setBackgroundColor(getResources().getColor(R.color.trans_black));
-                text.setTypeface(Typeface.defaultFromStyle(Typeface.ITALIC));
-                text.setLayoutParams(tParams);
-
-                rLayout.addView(IM);
-                rLayout.addView(text);
-
-
-                /*
-                Picasso.with(MainActivity.this).load(images.get(position)).networkPolicy(NetworkPolicy.OFFLINE)
-                        .into(IM, new Callback() {
-                            @Override
-                            public void onSuccess() {
-
-                            }
-
-                            @Override
-                            public void onError() {
-                                Picasso.with(MainActivity.this).load(images.get(position)).into(IM);
-                            }
-                        });
-                        */
-                container.addView(rLayout);
-
-                    return rLayout;
-            }
-
-            @Override
-            public void destroyItem(ViewGroup container, int position, Object object) {
-                //  super.destroyItem(container, position, object);
-                container.removeView((RelativeLayout)object);
-            }
-
-
-            @Override
-            public int getCount() {
-
-                return 5;
-
-            }
-        });
-
-        viewPager.startAutoScroll();
-        viewPager.setSlideInterval(3000);
-        viewPager.setCycle(true);
-        viewPager.setSlideDuration(1500);
-
-        rv.setAdapter(new RecyclerView.Adapter<RecyclerViewHolder>() {
-            @Override
-            public RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.event_card, parent, false);
-                return new RecyclerViewHolder(view);
-            }
-
-            @Override
-            public void onBindViewHolder(final RecyclerViewHolder holder, final int position) {
-
-
-
-                /*
-                mdatabase.child("Events").child(Events.get(position)).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        try {
-                            cA.setName(dataSnapshot.getValue(CommonAdapter.class).getName());
-                            holder.setName(cA.getName());
-                            cA.setImage(dataSnapshot.getValue(CommonAdapter.class).getImage());
-                            holder.setImage(MainActivity.this, cA.getImage());
-                            holder.mview.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    Intent i = new Intent(MainActivity.this, EventDetail.class);
-                                    i.putExtra("key", Events.get(position));
-                                    startActivity(i);
-                                }
-                            });
-                        }
-                        catch (NullPointerException e)
-                        {
-
-                        }
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-                    */
-
-               holder.setImagefromSrc(R.drawable.udbhav_icon);
-                holder.setName("Udbhav 2018");
-                holder.mview.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        fab.setVisibility(View.INVISIBLE);
-                        ft=getSupportFragmentManager().beginTransaction().addToBackStack(null);
-                        ft.replace(R.id.main_content,new UdbhavFragment()).commit();
-
-                    }
-                });
-            }
-
-
-            @Override
-            public int getItemCount() {
-
-                return 1;
-            }
-        });
-        rv.setLayoutManager(new LinearLayoutManager(MainActivity.this));
-        rv.getAdapter().notifyDataSetChanged();
-    }
-
-            @Override
+        @Override
             protected void onResume() {
                 super.onResume();
                 rv.getAdapter().notifyDataSetChanged();
-                viewPager.getAdapter().notifyDataSetChanged();
+
+            }
+
+    public class FirebaseCallbacks implements LoaderManager.LoaderCallbacks<Bundle>{
+        @Override
+        public Loader<Bundle> onCreateLoader(int i, Bundle bundle) {
+            String title=bundle.getString("title");
+            String url=bundle.getString("url");
+
+            return new  FirebaseLoder(MainActivity.this,title,url,bundle.getString("key"));
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Bundle> loader, Bundle bundle) {
+            try {
+                titles.add(bundle.getString("title"));
+                byte[] byteArray = bundle.getByteArray("image");
+                Bitmap bmp = null;
+                if (byteArray != null) {
+                    bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+                }
+                images.add(bmp);
+                Events.add(bundle.getString("key"));
+                recyclerAdapter.updateData(titles,images,Events);
+                recyclerAdapter.notifyDataSetChanged();
+                ((CatchEvent)MainActivity.this.getApplication()).updateData(titles,images,Events);
+            }catch (Exception e){
+                e.printStackTrace();
             }
         }
+
+        @Override
+        public void onLoaderReset(Loader<Bundle> loader) {
+
+        }
+    }
+
+    private static class FirebaseLoder extends AsyncTaskLoader<Bundle> {
+        String s1,s2,s3;
+
+        FirebaseLoder(Context context, String t, String u,String k) {
+            super(context);
+            s1=t;
+            s2=u;
+            s3=k;
+        }
+
+        @Override
+        public Bundle loadInBackground() {
+            Bundle b=new Bundle();
+            try {
+                Bitmap bitmap;
+                //download image from url
+                URL urlConnection = new URL(s2);
+                HttpURLConnection connection = (HttpURLConnection) urlConnection
+                        .openConnection();
+                connection.setDoInput(true);
+                connection.connect();
+                InputStream input = connection.getInputStream();
+                bitmap = BitmapFactory.decodeStream(input);
+
+                //put Bitmap in Bundle
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] byteArray = stream.toByteArray();
+
+
+                ContentValues cv=new ContentValues();
+                cv.put("Name",s1);
+                cv.put("ImageRes",byteArray);
+                cv.put("EventKey",s3);
+                sdatabase.insert("Events",null,cv);
+
+                b.putByteArray("image",byteArray);
+                b.putString("title",s1);
+                b.putString("key",s3);
+
+                return b;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
+    private class LoaderCallbacks implements LoaderManager.LoaderCallbacks<EventsHolder> {
+        @Override
+        public Loader<EventsHolder> onCreateLoader(int i, Bundle bundle) {
+            cursor=sdatabase.query("Events",
+                    new String[]{"Name","ImageRes","EventKey"},
+                    null,null,
+                    null,null,
+                    null);
+
+            return new CusrorLoader(MainActivity.this,cursor);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<EventsHolder> loader, EventsHolder holder) {
+            try {
+                titles.addAll(holder.Titles);
+                images.addAll(holder.imgs);
+                Events.addAll(holder.keys);
+                recyclerAdapter.updateData(titles,images,Events);
+                recyclerAdapter.notifyDataSetChanged();
+                ((CatchEvent)MainActivity.this.getApplication()).updateData(titles,images,Events);
+                initiateFirebaseLoaders();
+
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onLoaderReset(Loader<EventsHolder> loader) {
+
+        }
+    }
+
+
+    private static class CusrorLoader extends AsyncTaskLoader<EventsHolder>{
+        Cursor c;
+        final EventsHolder holder;
+        CusrorLoader(Context context, Cursor cursor) {
+            super(context);
+            this.c=cursor;
+            holder = new EventsHolder();
+        }
+
+        @Override
+        public EventsHolder loadInBackground() {
+
+            if (c != null) {
+
+                if (c.moveToFirst()) {
+                    do {
+                        holder.Titles.add(c.getString(0));
+                        /*If file cursor have filepath
+                         File image = new File( c.getString(1));
+                          BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+                        Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions);
+                           */
+                        byte[] image=c.getBlob(1);
+                        Bitmap bitmap=BitmapFactory.decodeByteArray(image,0,image.length);
+                        holder.imgs.add(bitmap);
+                        holder.keys.add(c.getString(2));
+
+                    } while (c.moveToNext());
+                }
+
+                return holder;
+            }
+            return null;
+        }
+
+    }
+}

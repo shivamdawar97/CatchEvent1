@@ -36,7 +36,7 @@ public class EventDetail extends AppCompatActivity {
     FirebaseUser muser;
     EditText fst,snd,thd;
     CommonAdapter ca;
-    String imageurl;
+    int  position;
     TextView title,regfee,date,time,desc;
     View layout;
     String s;
@@ -63,8 +63,10 @@ public class EventDetail extends AppCompatActivity {
         time=findViewById(R.id.Timings);
         desc=findViewById(R.id.desc);
         mdata= FirebaseDatabase.getInstance().getReference();
+
         keyID=getIntent().getStringExtra("key");
-        populate(keyID,im);
+        position=getIntent().getIntExtra("pos",0);
+        populate(keyID,im,position);
 
         if(muser==null ){
             fst.setFocusable(false);
@@ -75,7 +77,7 @@ public class EventDetail extends AppCompatActivity {
 
     }
 
-    private void populate(final String keyID, final ImageView imageView) {
+    private void populate(final String keyID, final ImageView imageView, final int position) {
 
         mdata.child("Events").child(keyID).addValueEventListener(new ValueEventListener() {
             @Override
@@ -83,14 +85,14 @@ public class EventDetail extends AppCompatActivity {
 
                 try {
 
-
                     s = dataSnapshot.child("name").getValue().toString();
                     title.setText(s);
                     android.support.v7.app.ActionBar actionBar = getSupportActionBar();
                     actionBar.setTitle(s);
                     actionBar.setDisplayHomeAsUpEnabled(true);
-                    imageurl=dataSnapshot.child("image").getValue().toString();
-                    Picasso.with(EventDetail.this).load(imageurl).into(imageView);
+
+                    imageView.setImageBitmap(((CatchEvent)EventDetail.this.getApplication()).getImageAtPos(position));
+
                     date.setText(" DATE :" + dataSnapshot.child("date").getValue());
                     date.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_date_range_black_24dp, 0, 0, 0);
                     time.setText(" Timings :" + dataSnapshot.child("time").getValue().toString() +
@@ -227,7 +229,7 @@ public class EventDetail extends AppCompatActivity {
         android.support.v4.app.FragmentTransaction transaction=getSupportFragmentManager().beginTransaction().addToBackStack(null);
         Bundle b=new Bundle();
         b.putInt("pos",-3);
-        b.putString("img",imageurl);
+        b.putInt("img",position);
         Image_slider im=new Image_slider();
         im.setArguments(b);
         transaction.replace(R.id.detailcontent,im).commit();

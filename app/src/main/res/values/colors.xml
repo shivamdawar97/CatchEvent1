@@ -7,4 +7,6 @@
     <color name="trans">#66b300b3</color>
     <color name="trans2">#66f2d9e6</color>
     <color name="bgname">#f2d9e6</color>
+    <color name="select">#6666ff</color>
+
 </resources>

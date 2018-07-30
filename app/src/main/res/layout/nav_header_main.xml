@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="@dimen/nav_header_height"
-    android:background="@color/colorAccent"
+    android:background="@drawable/gradient2"
     android:gravity="bottom"
     android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
@@ -16,19 +16,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:text="Udbhav 2018"
+        android:text="@string/college_name"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="@color/cardview_dark_background"
         android:textSize="18sp"
         android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="IPEC Techno Cultural Fest "
-        android:textColor="@color/cardview_dark_background"
-        android:textSize="14sp"
-        android:textStyle="bold" />
 
 </LinearLayout>

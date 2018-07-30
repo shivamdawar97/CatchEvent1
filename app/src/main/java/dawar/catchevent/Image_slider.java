@@ -1,6 +1,8 @@
 package dawar.catchevent;
 
 
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
@@ -31,10 +33,10 @@ public class Image_slider extends Fragment {
         private ArrayList<String> dates;
         private ArrayList<String> images,captns;
         TextView dateview,counts,captn;
+        Context context;
     public Image_slider() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -131,11 +133,13 @@ public class Image_slider extends Fragment {
                 dateview.setVisibility(View.INVISIBLE);
                 counts.setVisibility(View.INVISIBLE);
                 captn.setVisibility(View.INVISIBLE);
-                String s=getArguments().getString("img");
+                int pos=getArguments().getInt("img");
                 final ImageView IM = new ImageView(getContext());
+                Bitmap bitmap=((CatchEvent)getActivity().getApplication()).getImageAtPos(pos);
+                IM.setImageBitmap(bitmap);
                 IM.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT));
-                Picasso.with(getContext()).load(s).networkPolicy(NetworkPolicy.OFFLINE).into(IM);
+
                 relativeLayout.addView(IM);
             }
         }

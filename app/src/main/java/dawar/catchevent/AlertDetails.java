@@ -206,14 +206,7 @@ public class AlertDetails extends AppCompatActivity {
         menu.removeItem(R.id.action_logout);
         menu.removeItem(R.id.action_login);
         menu.removeItem(R.id.action_settings);
-        MenuItem item=menu.findItem(R.id.refresh);
-        item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                al_rv.getAdapter().notifyDataSetChanged();
-                return AlertDetails.super.onOptionsItemSelected(menuItem);
-            }
-        });
+
         return super.onCreateOptionsMenu(menu);
     }
 

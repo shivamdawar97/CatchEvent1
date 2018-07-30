@@ -36,8 +36,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 public  class CommonAdapter  {
     private static int  RC_SIGN_IN = 10;
-    private String name;
-    private String image;
+
     FirebaseAuth mAuth;
     String m_Text;
     private GoogleApiClient mgoogleApiClient;
@@ -49,27 +48,6 @@ public  class CommonAdapter  {
         this.mAuth=mAuth;
         m_Text=new String("");
 
-
-    }
-
-    CommonAdapter(){
-
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
     }
 
     public void signIn(){
