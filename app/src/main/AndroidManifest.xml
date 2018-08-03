@@ -34,13 +34,13 @@
             android:name=".EventDetail"
             android:label="@string/title_activity_event_detail"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".GalleryActivity" />
+        <activity android:name=".GalleryAndAlertClasses.GalleryActivity" />
         <activity
             android:name=".ListActivity"
             android:label="@string/title_activity_list"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".AddAlerts"
+            android:name=".GalleryAndAlertClasses.AddAlerts"
             android:label="@string/title_activity_add_alerts"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".AlertDetails" />

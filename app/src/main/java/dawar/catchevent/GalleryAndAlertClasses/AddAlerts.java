@@ -1,4 +1,4 @@
-package dawar.catchevent;
+package dawar.catchevent.GalleryAndAlertClasses;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -36,6 +36,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.UUID;
+
+import dawar.catchevent.R;
 
 public class AddAlerts extends AppCompatActivity {
     DatabaseReference mdata;

@@ -1,9 +1,6 @@
 package dawar.catchevent;
 
-import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -23,9 +20,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
+import dawar.catchevent.GalleryAndAlertClasses.GalleryActivity;
+import dawar.catchevent.LogInClasses.LogInActivity;
 
 public class EventDetail extends AppCompatActivity {
 
@@ -35,7 +32,7 @@ public class EventDetail extends AppCompatActivity {
     FirebaseAuth mAuth;
     FirebaseUser muser;
     EditText fst,snd,thd;
-    CommonAdapter ca;
+
     int  position;
     TextView title,regfee,date,time,desc;
     View layout;
@@ -172,14 +169,14 @@ public class EventDetail extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            ca=new CommonAdapter(EventDetail.this,mAuth);
-            ca.showSettings(-1);
+            Intent i=new Intent(EventDetail.this,ListActivity.class);
+            i.putExtra("sett",-1);
+            startActivity(i);
             return true;
         }
 
         if(id == R.id.action_login){
-            ca=new CommonAdapter(EventDetail.this,mAuth );
-            ca.signIn();
+            startActivity(new Intent(EventDetail.this, LogInActivity.class));
             return true;
         }
         if(id==R.id.action_logout){
@@ -203,11 +200,6 @@ public class EventDetail extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        ca=new CommonAdapter(EventDetail.this,mAuth );
-        ca.onActivityOfResult(requestCode, resultCode, data);
-    }
 
     public void showGallery(View view) {
         Intent i=new Intent(EventDetail.this,GalleryActivity.class);
@@ -220,8 +212,6 @@ public class EventDetail extends AppCompatActivity {
                 i.putExtra("name",s);
             }
         i.putExtra("key",keyID);
-
-
         startActivity(i);
     }
 

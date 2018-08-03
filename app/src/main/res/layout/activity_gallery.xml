@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bgname"
-    tools:context="dawar.catchevent.GalleryActivity">
+    tools:context="dawar.catchevent.GalleryAndAlertClasses.GalleryActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -24,6 +24,7 @@
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
     </android.support.design.widget.AppBarLayout>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/gallery_recycler"
         android:layout_width="match_parent"

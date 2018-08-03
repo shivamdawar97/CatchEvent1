@@ -27,4 +27,7 @@
     <string name="share_ex">Tell us your Expirience with this app.
         If app get crashed tell us where it does.</string>
     <string name="college_name">Inderprastha Enginnering college</string>
+    <string name="sign_in">Sign in</string>
+    <string name="dont_account">Don\'t have an Account?</string>
+    <string name="back"><u>Back</u></string>
 </resources>

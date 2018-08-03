@@ -1,9 +1,9 @@
 package dawar.catchevent;
 
-import android.*;
+
 import android.Manifest;
 import android.app.AlertDialog;
-import android.app.Application;
+
 import android.app.LoaderManager;
 import android.app.ProgressDialog;
 import android.content.AsyncTaskLoader;
@@ -14,29 +14,21 @@ import android.content.Intent;
 import android.content.Loader;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.PagerAdapter;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.test.mock.MockApplication;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
+
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -45,57 +37,40 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
 
-import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
-
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 
-import com.github.demono.AutoScrollViewPager;
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GoogleAuthProvider;
+
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.NetworkPolicy;
-import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.ByteBuffer;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.UUID;
 
+import dawar.catchevent.GalleryAndAlertClasses.GalleryActivity;
 import dawar.catchevent.LogInClasses.LogInActivity;
 
+import static dawar.catchevent.CatchEvent.mdatabase;
+import static dawar.catchevent.CatchEvent.sdatabase;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener
@@ -103,16 +78,14 @@ public class MainActivity extends AppCompatActivity
     RecyclerView rv;
     FirebaseUser muser;
     AlertDialog.Builder builder;
-    DatabaseReference mdatabase;
+
     Cursor cursor;
-    static SQLiteDatabase sdatabase;
-    DatabaseHelper databaseHelper;
+
     android.support.v4.app.FragmentTransaction ft;
     ArrayList<String> titles;
     ArrayList<String> Events;
     ArrayList<Bitmap> images;
-    CommonAdapter cA;
-    FloatingActionButton fab;
+
     private FirebaseAuth mAuth;
     int i=0;
     RecyclerAdapter recyclerAdapter;
@@ -128,36 +101,14 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar =  findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        cA = new CommonAdapter(MainActivity.this,mAuth);
         titles=new ArrayList<>();
         images=new ArrayList<>();
         Events=new ArrayList<>();
-        databaseHelper=new DatabaseHelper(this,"Events",null,1);
-        sdatabase=databaseHelper.getReadableDatabase();
-        mdatabase=((CatchEvent)this.getApplication()).getMdatabase();
 
         rv=  findViewById(R.id.recycler_view);
         rv.setLayoutManager(new LinearLayoutManager(this));
         recyclerAdapter=new RecyclerAdapter(this,titles,images,Events);
         rv.setAdapter(recyclerAdapter);
-
-        fab =  findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                muser = mAuth.getCurrentUser();
-                if(muser==null)
-                Snackbar.make(view, "LogIn First to Add Events here", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                else
-                {
-                    startActivity(new Intent(MainActivity.this,AddEvent.class));
-                }
-            }
-        });
-        if(mAuth.getCurrentUser() == null) {
-            fab.setVisibility(View.INVISIBLE);
-        }
-
 
         DrawerLayout drawer =  findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -174,6 +125,7 @@ public class MainActivity extends AppCompatActivity
      }
 
      private void initiateFirebaseLoaders(){
+
          mdatabase.child("Events").addChildEventListener(new ChildEventListener() {
              @Override
              public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -199,7 +151,16 @@ public class MainActivity extends AppCompatActivity
 
              @Override
              public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                 String s=dataSnapshot.getKey();
+                 if(Events.contains(s)){
+                     int i=Events.indexOf(s);
+                     Events.remove(i);
+                     titles.remove(i);
+                     images.remove(i);
+                     recyclerAdapter.updateData(titles,images,Events);
+                     recyclerAdapter.notifyDataSetChanged();
+                     sdatabase.delete("Events","EventKey=?",new String[]{s});
+                 }
              }
 
              @Override
@@ -215,6 +176,13 @@ public class MainActivity extends AppCompatActivity
 
      }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+
+
+    }
     @Override
     public void onBackPressed() {
         DrawerLayout drawer =  findViewById(R.id.drawer_layout);
@@ -260,7 +228,10 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            cA.showSettings(-1);
+
+            Intent i=new Intent(MainActivity.this,ListActivity.class);
+            i.putExtra("sett",-1);
+            startActivity(i);
             return true;
         }
 
@@ -271,11 +242,6 @@ public class MainActivity extends AppCompatActivity
         if(id==R.id.action_logout){
             if(muser!=null) {
                 mAuth.signOut();
-                synchronized (mAuth) {
-                    muser=null;
-                    mAuth.notify();
-                }
-                fab.setVisibility(View.INVISIBLE);
                 Snackbar.make(getCurrentFocus(), "Logged Out Successfully", Snackbar.LENGTH_LONG).setAction("Action", null).show();
             }
             else    {
@@ -398,12 +364,8 @@ public class MainActivity extends AppCompatActivity
             }
 
 
-
-
     @Override
     protected void onActivityResult(final int requestCode, int resultCode, final Intent data) {
-        if(requestCode==10)
-        cA.onActivityOfResult(requestCode, resultCode, data);
 
         if((requestCode==9 || requestCode==8) && data!=null ){
 
@@ -493,12 +455,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-        @Override
-            protected void onResume() {
-                super.onResume();
-                rv.getAdapter().notifyDataSetChanged();
-
-            }
 
     public class FirebaseCallbacks implements LoaderManager.LoaderCallbacks<Bundle>{
         @Override
@@ -581,6 +537,7 @@ public class MainActivity extends AppCompatActivity
             return null;
         }
     }
+
     private class LoaderCallbacks implements LoaderManager.LoaderCallbacks<EventsHolder> {
         @Override
         public Loader<EventsHolder> onCreateLoader(int i, Bundle bundle) {
