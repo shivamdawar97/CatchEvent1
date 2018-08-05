@@ -73,10 +73,12 @@ public class ListActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
                 if(t==-1){
-                    if(i==4)
-                        startActivity(new Intent(ListActivity.this,AddEvent.class)
+                    if(i==4) {
+                        startActivity(new Intent(ListActivity.this, AddEvent.class)
                                 .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-                    actionBar.setTitle(setlist.get(i)+">>");
+                        return;
+                    }
+                        actionBar.setTitle(setlist.get(i)+">>");
                         t=i;
                     setlist.clear();
                     mdata.child("Events").addChildEventListener(new ChildEventListener() {
