@@ -26,6 +26,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import dawar.catchevent.GalleryAndAlertClasses.AddAlerts;
 
@@ -54,6 +55,7 @@ public class ListActivity extends AppCompatActivity {
             setlist.add("Add an Alert");
             setlist.add("Delete an Event");
             setlist.add("Delete an Alert");
+            setlist.add("Add an Event");
            // setlist.add("Update Tumbnail Events");
 
         }
@@ -71,6 +73,9 @@ public class ListActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
                 if(t==-1){
+                    if(t==4)
+                        startActivity(new Intent(ListActivity.this,AddEvent.class)
+                                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                     actionBar.setTitle(setlist.get(i)+">>");
                         t=i;
                     setlist.clear();
