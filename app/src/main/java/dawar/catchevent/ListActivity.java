@@ -73,7 +73,7 @@ public class ListActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
                 if(t==-1){
-                    if(t==4)
+                    if(i==4)
                         startActivity(new Intent(ListActivity.this,AddEvent.class)
                                 .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                     actionBar.setTitle(setlist.get(i)+">>");
