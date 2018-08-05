@@ -56,7 +56,7 @@ public class ListActivity extends AppCompatActivity {
             setlist.add("Delete an Event");
             setlist.add("Delete an Alert");
             setlist.add("Add an Event");
-           // setlist.add("Update Tumbnail Events");
+
 
         }
 
