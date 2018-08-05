@@ -70,18 +70,14 @@ public class SignInFragment extends Fragment {
         v=inflater.inflate(R.layout.fragment_sign_in, container, false);
 
         needAcc=v.findViewById(R.id.textView8);
-        needAcc.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                LogInActivity.notifyPagesAdded(new BlankFragment(),new SignUpFragment());
-
-            }
-        });
+        needAcc.setOnClickListener(new
+                NeedAccListener());
         activity=getActivity();
         signIn=v.findViewById(R.id.button4);
         editEmail=v.findViewById(R.id.editEmail);
         editPassword=v.findViewById(R.id.editPass);
         googlebtn=v.findViewById(R.id.googlebtn);
+
         googlebtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -93,6 +89,7 @@ public class SignInFragment extends Fragment {
                 mgoogleApiClient.disconnect();
             }
         });
+
         signIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -100,6 +97,15 @@ public class SignInFragment extends Fragment {
             }
         });
         return v;
+    }
+
+    private static class NeedAccListener implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+
+            LogInActivity.notifyPagesAdded(new BlankFragment(),new SignUpFragment());
+
+        }
     }
 
     private void signInwithEmailandPass() {
@@ -122,6 +128,7 @@ public class SignInFragment extends Fragment {
                                 // Sign in success, update UI with the signed-in user's information
 
                                 FirebaseUser user = mAuth.getCurrentUser();
+
                                 updateUI(user);
                                 getActivity().finish();
                                 startActivity(new Intent(getActivity(), MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
@@ -140,9 +147,10 @@ public class SignInFragment extends Fragment {
         }
     }
 
-    private void updateUI(FirebaseUser user) {
+    private void updateUI(final FirebaseUser user) {
 
-        String id=user.getUid();
+        final String id=user.getUid();
+
         mdatabase.child("users").child(id).child("userType").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -179,8 +187,7 @@ public class SignInFragment extends Fragment {
     private void checkUser(final FirebaseUser user) {
 
         final String id = user.getUid();
-        mUSerData = mdatabase.child("user");
-
+        mUSerData = mdatabase.child("users");
 
 
         mUSerData.addValueEventListener(new ValueEventListener() {
@@ -188,21 +195,27 @@ public class SignInFragment extends Fragment {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.hasChild(id)) {
                     //Send user to Register Fragment
+
+                    Boolean b=dataSnapshot.hasChild(id);
+                    Toast.makeText(activity,b.toString(),Toast.LENGTH_LONG).show();
                     mAuth.signOut();
                     user.delete();
-                    Toast.makeText(activity, "Register first", Toast.LENGTH_LONG).show();
-                    needAcc.callOnClick();
+                    if(LogInActivity.fragments.size()<3) {
+                        Toast.makeText(activity, "Register first", Toast.LENGTH_LONG).show();
+                        needAcc.callOnClick();
+                    }
+                    else
+                        LogInActivity.viewPager.setCurrentItem(1,true);
+                }
+                else
+                {
+                    Toast.makeText(activity,"log in Successful",Toast.LENGTH_LONG).show();
                 }
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
         });
-
-
     }
-
-
 }

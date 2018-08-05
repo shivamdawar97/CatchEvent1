@@ -43,6 +43,7 @@ public  class CommonAdapter  {
     public static Context ctx;
     private static  GoogleSignInOptions gso;
 
+
     CommonAdapter(final Context ctx){
         this.ctx=ctx;
 
@@ -63,7 +64,8 @@ public  class CommonAdapter  {
      static GoogleSignInAccount onActivityOfResult(int i, int i1, Intent intent) {
         //onActivityResult(i,i1,intent);
 
-        if (i == RC_SIGN_IN) {
+        if (i == RC_SIGN_IN || i==RC_SIGN_UP) {
+
             GoogleSignInResult task = Auth.GoogleSignInApi.getSignInResultFromIntent(intent);
             // Google Sign In was successful, authenticate with Firebase
             if(task.isSuccess()) {
@@ -71,6 +73,7 @@ public  class CommonAdapter  {
                 return task.getSignInAccount();
             }
             else {
+
                 Toast.makeText(ctx,"LogIn Failed",Toast.LENGTH_SHORT).show();
 
             }
