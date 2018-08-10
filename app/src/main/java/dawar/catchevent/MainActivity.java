@@ -47,7 +47,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -55,19 +54,19 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.UUID;
-
 import dawar.catchevent.GalleryAndAlertClasses.GalleryActivity;
+import dawar.catchevent.GalleryAndAlertClasses.GalleryProvider;
+import dawar.catchevent.GalleryAndAlertClasses.LoaderClasses;
 import dawar.catchevent.LogInClasses.LogInActivity;
+
 
 import static dawar.catchevent.CatchEvent.mdatabase;
 import static dawar.catchevent.CatchEvent.sdatabase;
@@ -80,7 +79,6 @@ public class MainActivity extends AppCompatActivity
     AlertDialog.Builder builder;
 
     Cursor cursor;
-
     android.support.v4.app.FragmentTransaction ft;
     ArrayList<String> titles;
     ArrayList<String> Events;
@@ -121,6 +119,7 @@ public class MainActivity extends AppCompatActivity
 
        getLoaderManager().initLoader(i,null,new LoaderCallbacks()).forceLoad();
        i++;
+
 
      }
 
@@ -468,17 +467,20 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onLoadFinished(Loader<Bundle> loader, Bundle bundle) {
             try {
+
                 titles.add(bundle.getString("title"));
                 byte[] byteArray = bundle.getByteArray("image");
                 Bitmap bmp = null;
                 if (byteArray != null) {
                     bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
                 }
+
                 images.add(bmp);
                 Events.add(bundle.getString("key"));
                 recyclerAdapter.updateData(titles,images,Events);
                 recyclerAdapter.notifyDataSetChanged();
                 ((CatchEvent)MainActivity.this.getApplication()).updateData(titles,images,Events);
+
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -514,7 +516,7 @@ public class MainActivity extends AppCompatActivity
                 InputStream input = connection.getInputStream();
                 bitmap = BitmapFactory.decodeStream(input);
 
-                //put Bitmap in Bundle
+                //put Bitmap in byteArray
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
                 byte[] byteArray = stream.toByteArray();
@@ -529,6 +531,9 @@ public class MainActivity extends AppCompatActivity
                 b.putByteArray("image",byteArray);
                 b.putString("title",s1);
                 b.putString("key",s3);
+
+
+
 
                 return b;
             } catch (Exception e) {
@@ -608,5 +613,11 @@ public class MainActivity extends AppCompatActivity
             return null;
         }
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        cursor.close();
     }
 }

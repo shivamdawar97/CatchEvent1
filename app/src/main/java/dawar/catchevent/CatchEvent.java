@@ -2,6 +2,7 @@ package dawar.catchevent;
 
 import android.app.Application;
 
+import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 
@@ -15,6 +16,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 
+import dawar.catchevent.GalleryAndAlertClasses.LoaderClasses;
 
 /**
  * Created by shivam97 on 28/2/18.
@@ -28,7 +30,7 @@ public class CatchEvent extends Application {
     public static SQLiteDatabase sdatabase;
     public static int userType;
 
-    DatabaseHelper databaseHelper;
+     DatabaseHelper databaseHelper;
     ArrayList<String> Titles,keys;
 
     ArrayList<Bitmap> images;
@@ -53,16 +55,13 @@ public class CatchEvent extends Application {
         databaseHelper=new DatabaseHelper(this,"Events",null,1);
         sdatabase=databaseHelper.getReadableDatabase();
 
-
-
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         mdatabase=FirebaseDatabase.getInstance().getReference();
         mstorage= FirebaseStorage.getInstance().getReference();
         mAuth=FirebaseAuth.getInstance();
 
 
-
-
     }
+
 
 }

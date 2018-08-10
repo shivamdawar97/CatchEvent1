@@ -46,7 +46,7 @@ public class AddAlerts extends AppCompatActivity {
     RecyclerView recycler;
     ProgressDialog pd;
     ArrayList<Bitmap> bitmaps;
-    ArrayList<String> captions,date;
+    ArrayList<String> captions;
     private StorageReference riversRef;
 
     @Override
@@ -71,7 +71,7 @@ public class AddAlerts extends AppCompatActivity {
 
         bitmaps=new ArrayList<>();
         captions=new ArrayList<>();
-        date=new ArrayList<>();
+
         recycler=findViewById(R.id.alert_recycler);
         mdata = FirebaseDatabase.getInstance().getReference();
         // ArrayAdapter aa = new ArrayAdapter(this, android.R.layout.simple_list_item_1,);
@@ -125,8 +125,7 @@ public class AddAlerts extends AppCompatActivity {
            newPost.child("desc").setValue(s);
            s = Calendar.getInstance().getTime().toString();
            newPost.child("date").setValue(s);
-           s =getIntent().getStringExtra("name");
-           newPost.child("ename").setValue(s);
+           newPost.child("eventkey").setValue(postkey);
            s =newPost.getKey();
            newPost=newPost.child("images");
 
@@ -150,11 +149,11 @@ public class AddAlerts extends AppCompatActivity {
                        final Uri dnldurl=taskSnapshot.getDownloadUrl();
                        DatabaseReference newpost1=mdata.child("Gallery").push();
                        newpost1.child("url").setValue(dnldurl.toString());
-                       newpost1.child("date").setValue(date.get(finalI));
                        newpost1.child("captn").setValue(captions.get(finalI));
+                       newpost1.child("eventKey").setValue(postkey);
                        String s =newpost1.getKey();
-                       newpost1=mdata.child("Events").child(postkey).child("Gallery").push();
-                       newpost1.setValue(s);
+                      // newpost1=mdata.child("Events").child(postkey).child("Gallery").push();
+                      // newpost1.setValue(s);
                        finalNewPost.push().setValue(s);
                    }
                }).addOnFailureListener(new OnFailureListener() {
@@ -202,10 +201,12 @@ public class AddAlerts extends AppCompatActivity {
                             dialogInterface.dismiss();
                             Bitmap bitmap;
                             try {
+
                                 bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),data.getData());
                                 bitmaps.add(0,bitmap);
+                                cptn[0]=cptn[0]+"\n"+Calendar.getInstance().getTime().toString()+
+                                "\n Event:"+getIntent().getStringExtra("name");
                                 captions.add(0,cptn[0]);
-                                date.add(0,Calendar.getInstance().getTime().toString());
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }

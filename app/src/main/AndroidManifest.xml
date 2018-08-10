@@ -54,6 +54,12 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".UdbhavMainActivity" />
         <activity android:name=".LogInClasses.LogInActivity"></activity>
+
+        <provider
+            android:authorities="dawar.catchevent.GalleryAndAlertClasses"
+            android:name=".GalleryAndAlertClasses.GalleryProvider"
+            android:exported="false"
+            />
     </application>
 
 </manifest>
