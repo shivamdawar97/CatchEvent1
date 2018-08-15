@@ -5,9 +5,11 @@ import android.app.Application;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.os.Bundle;
 
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -15,6 +17,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import dawar.catchevent.GalleryAndAlertClasses.LoaderClasses;
 
@@ -29,10 +32,10 @@ public class CatchEvent extends Application {
     public static FirebaseAuth mAuth;
     public static SQLiteDatabase sdatabase;
     public static int userType;
+    public static ArrayList<String> imgKeys,altKeys;
 
      DatabaseHelper databaseHelper;
     ArrayList<String> Titles,keys;
-
     ArrayList<Bitmap> images;
 
     public ArrayList<Bitmap> getImages() {
@@ -59,9 +62,19 @@ public class CatchEvent extends Application {
         mdatabase=FirebaseDatabase.getInstance().getReference();
         mstorage= FirebaseStorage.getInstance().getReference();
         mAuth=FirebaseAuth.getInstance();
-
+        imgKeys=new ArrayList<>();
+        altKeys=new ArrayList<>();
 
     }
-
-
+    public static Bundle fireImg(String s, DataSnapshot dataSnapshot){
+        Bundle bundle = new Bundle();
+        bundle.putString("imgKey", s);
+        s = Objects.requireNonNull(dataSnapshot.child("url").getValue()).toString();
+        bundle.putString("url", s);
+        s = Objects.requireNonNull(dataSnapshot.child("eventKey").getValue()).toString();
+        bundle.putString("eventKey", s);
+        s = Objects.requireNonNull(dataSnapshot.child("captn").getValue()).toString();
+        bundle.putString("captn", s);
+        return bundle;
+    }
 }

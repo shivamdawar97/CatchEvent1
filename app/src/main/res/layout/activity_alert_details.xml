@@ -5,7 +5,7 @@
     android:id="@+id/al_det_cont"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="dawar.catchevent.AlertDetails">
+    tools:context="dawar.catchevent.GalleryAndAlertClasses.AlertDetails">
 
     <TextView
         android:id="@+id/al_ttl_view"

@@ -63,8 +63,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.UUID;
 import dawar.catchevent.GalleryAndAlertClasses.GalleryActivity;
-import dawar.catchevent.GalleryAndAlertClasses.GalleryProvider;
-import dawar.catchevent.GalleryAndAlertClasses.LoaderClasses;
 import dawar.catchevent.LogInClasses.LogInActivity;
 
 
@@ -319,8 +317,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_gallery) {
 
             intent = new Intent(this, GalleryActivity.class);
-            intent.putExtra("view", 3);
-            intent.putExtra("name", "Gallery");
+            intent.putExtra("view", 1);
             startActivity(intent);
 
         } else if (id == R.id.nav_Alerts) {

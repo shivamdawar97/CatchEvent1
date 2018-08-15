@@ -22,6 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import dawar.catchevent.GalleryAndAlertClasses.GalleryActivity;
+import dawar.catchevent.GalleryAndAlertClasses.Image_slider;
 import dawar.catchevent.LogInClasses.LogInActivity;
 
 public class EventDetail extends AppCompatActivity {
@@ -45,7 +46,6 @@ public class EventDetail extends AppCompatActivity {
         setContentView(R.layout.activity_event_detail);
         Toolbar toolbar =  findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        s=new String();
         layout=findViewById(R.id.detailcontent);
         im=findViewById(R.id.imageView2);
         mAuth=FirebaseAuth.getInstance();
@@ -150,10 +150,12 @@ public class EventDetail extends AppCompatActivity {
             item.setVisible(false);
             item=menu.findItem(R.id.action_settings);
             item.setVisible(false);
+
         }
         else {
             MenuItem item =menu.findItem(R.id.action_login);
             item.setVisible(false);
+
         }
         this.invalidateOptionsMenu();
         return true;
@@ -203,14 +205,12 @@ public class EventDetail extends AppCompatActivity {
 
     public void showGallery(View view) {
         Intent i=new Intent(EventDetail.this,GalleryActivity.class);
-            if(view.getId()==R.id.gal_btn){
-                i.putExtra("view",1);
-                i.putExtra("name",s);
-            }
-            else {
-                i.putExtra("view", 2);
-                i.putExtra("name",s);
-            }
+            if(view.getId()==R.id.gal_btn)
+                i.putExtra("view",2);
+
+            else
+                i.putExtra("view", 5);
+
         i.putExtra("key",keyID);
         startActivity(i);
     }

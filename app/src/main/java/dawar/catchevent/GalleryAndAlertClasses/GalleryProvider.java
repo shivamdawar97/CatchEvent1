@@ -6,8 +6,15 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
+import android.widget.Toast;
+
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
 
 import static dawar.catchevent.CatchEvent.sdatabase;
 
@@ -46,6 +53,7 @@ public class GalleryProvider extends ContentProvider {
     static final String CONTENT_TYPE_3 = ContentResolver.CURSOR_DIR_BASE_TYPE+"/"+ PATH_ALL_ALERTS;
     static final String CONTENT_TYPE_4 = ContentResolver.CURSOR_DIR_BASE_TYPE+"/"+ PATH_EVENT_ALERTS;
 
+
     @Nullable
     @Override
     public String getType(@NonNull Uri uri) {
@@ -75,6 +83,7 @@ public class GalleryProvider extends ContentProvider {
             case EVENT_IMAGES:
 
                 cursor=sdatabase.query("Gallery",strings,s,strings1,null,null,null);
+                cursor.setNotificationUri(getContext().getContentResolver(), uri);
                 return cursor;
 
             case ALL_ALERTS:

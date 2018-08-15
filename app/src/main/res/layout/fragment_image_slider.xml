@@ -3,7 +3,7 @@
     android:id="@+id/slider_relative"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="dawar.catchevent.Image_slider">
+    tools:context="dawar.catchevent.GalleryAndAlertClasses.Image_slider">
 
     <android.support.v4.view.ViewPager
         android:id="@+id/gal_pager"

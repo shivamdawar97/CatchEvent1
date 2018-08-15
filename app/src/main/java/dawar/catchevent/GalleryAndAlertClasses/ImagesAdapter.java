@@ -1,7 +1,5 @@
 package dawar.catchevent.GalleryAndAlertClasses;
 
-import android.app.Activity;
-import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -11,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,35 +18,51 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-import dawar.catchevent.Image_slider;
 import dawar.catchevent.R;
 
 public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ImagesViewHolder> {
-    static ArrayList<String> imgKeys;
-    private static ArrayList<String> captns;
-    private static ArrayList<Bitmap> images;
+
+     static ArrayList<String> captns;
+     static ArrayList<Bitmap> images;
     private Context ctx;
 
+
     ImagesAdapter(Context context){
-        imgKeys=new ArrayList<>();
+
         captns=new ArrayList<>();
         images=new ArrayList<>();
         ctx=context;
+        setHasStableIds(true);
 
     }
 
     void swapCusor(Cursor cursor){
 
         if(cursor!=null && cursor.getCount()>0) {
-            (new CursorBackground()).execute(cursor);
+            cursor.moveToFirst();
+            do {
+                Log.i("LogMessage","cursor recieved");
+                try {
+                    byte[] byteArray = cursor.getBlob(0);
+                    Bitmap bmp;
 
+                    if (byteArray != null && byteArray.length>0)
+                    {
+
+                        bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+                        captns.add(cursor.getString(1));
+                        images.add(bmp);
+                        this.notifyDataSetChanged();
+                    }
+                }
+                catch (IllegalStateException e){
+                    e.printStackTrace();
+                }
+
+            }
+            while (cursor.moveToNext());
         }
 
-    }
-     void updateData(Bitmap image,String captn){
-        images.add(image);
-        captns.add(captn);
-        this.notifyDataSetChanged();
     }
     @NonNull
     @Override
@@ -57,23 +72,21 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ImagesView
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ImagesViewHolder holder, final int position) {
-        holder.im.setImageBitmap(images.get(position));
+    public void onBindViewHolder(@NonNull final ImagesViewHolder holder, int position) {
+        holder.im.setImageBitmap(images.get(holder.getAdapterPosition()));
         holder.mview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*
+
                 Bundle b = new Bundle();
-                b.putInt("pos", position);
-                b.putStringArrayList("img", images);
-                b.putStringArrayList("dts", dates);
-                b.putStringArrayList("cts",captns);
-                FragmentTransaction t;
-                //TODO: getSupportFragmentManager
+                b.putInt("pos", holder.getAdapterPosition());
+
+               FragmentTransaction  transaction = ((GalleryActivity)ctx).getSupportFragmentManager().beginTransaction();
                 Image_slider image_slider = new Image_slider();
                 image_slider.setArguments(b);
-                t.replace(R.id.gal_const, image_slider).commit();
-                */
+                transaction.addToBackStack(null);
+                transaction.replace(R.id.gal_const, image_slider).commit();
+
             }
         });
     }
@@ -83,7 +96,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ImagesView
         return images.size();
     }
 
-     class ImagesViewHolder extends RecyclerView.ViewHolder {
+    static class ImagesViewHolder extends RecyclerView.ViewHolder {
         View mview;
         final ImageView im;
          ImagesViewHolder(View itemView) {
@@ -91,27 +104,19 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ImagesView
             mview=itemView;
             im=mview.findViewById(R.id.gallery_img);
         }
+
+        void setMviewforAlert(Bitmap b,Context ctx){
+             final ImageView im=mview.findViewById(R.id.gallery_img);
+             im.setImageBitmap(b);
+             Toast.makeText(ctx,"Image added",Toast.LENGTH_SHORT).show();
+         }
     }
+
      class CursorBackground extends AsyncTask<Cursor,Void,Void> {
 
         @Override
         protected Void doInBackground(Cursor... cursors) {
             Cursor cursor=cursors[0];
-            cursor.moveToFirst();
-            do {
-                byte[] byteArray = cursor.getBlob(1);
-                Bitmap bmp;
-                if (byteArray != null && byteArray.length>0)
-                {
-
-                    bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
-                    captns.add(cursor.getString(2));
-                    images.add(bmp);
-                    imgKeys.add(cursor.getString(0));
-
-                }
-            }
-            while (cursor.moveToNext());
 
             return null;
         }

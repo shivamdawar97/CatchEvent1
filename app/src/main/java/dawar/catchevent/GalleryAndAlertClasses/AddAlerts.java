@@ -77,19 +77,18 @@ public class AddAlerts extends AppCompatActivity {
         // ArrayAdapter aa = new ArrayAdapter(this, android.R.layout.simple_list_item_1,);
         // aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // spinner.setAdapter(aa);
-        recycler.setAdapter(new RecyclerView.Adapter<GalleryActivity.RecyclerViewHolder>() {
+        recycler.setAdapter(new RecyclerView.Adapter<ImagesAdapter.ImagesViewHolder>() {
+            @NonNull
             @Override
-            public GalleryActivity.RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            public ImagesAdapter.ImagesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 View view = LayoutInflater.from(AddAlerts.this).inflate(R.layout.image_view_card, parent, false);
-                return new GalleryActivity.RecyclerViewHolder(view);
+                return new ImagesAdapter.ImagesViewHolder(view);
             }
 
             @Override
-            public void onBindViewHolder(GalleryActivity.RecyclerViewHolder holder, int position) {
+            public void onBindViewHolder(@NonNull ImagesAdapter.ImagesViewHolder holder, int position) {
                 holder.setMviewforAlert(bitmaps.get(position),AddAlerts.this);
-
             }
-
 
 
             @Override
@@ -118,15 +117,22 @@ public class AddAlerts extends AppCompatActivity {
            pd.setTitle("Please wait...");
            pd.show();
            DatabaseReference newPost=mdata.child("Alerts").push();
+
             String s = title.getText().toString();
            newPost.child("title").setValue(s);
+
            riversRef = riversRef.child(s);
+
            s =desc.getText().toString();
            newPost.child("desc").setValue(s);
-           s = Calendar.getInstance().getTime().toString();
-           newPost.child("date").setValue(s);
+
+           s=getIntent().getStringExtra("name");
+           s=s+"/n "+Calendar.getInstance().getTime().toString();
+           newPost.child("captn").setValue(s);
+
            newPost.child("eventkey").setValue(postkey);
            s =newPost.getKey();
+
            newPost=newPost.child("images");
 
            for(int i=0;i<bitmaps.size();i++){

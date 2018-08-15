@@ -8,6 +8,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/bgname"
+
     android:orientation="vertical">
 
     <TextView
@@ -15,6 +16,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Title"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
         android:textSize="24sp" />
 
@@ -24,6 +27,8 @@
         android:layout_height="wrap_content"
         android:gravity="bottom"
         android:text="date"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
         android:textSize="16sp" />
 </LinearLayout>
