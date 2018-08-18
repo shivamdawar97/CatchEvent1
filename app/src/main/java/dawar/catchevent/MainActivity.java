@@ -543,13 +543,8 @@ public class MainActivity extends AppCompatActivity
     private class LoaderCallbacks implements LoaderManager.LoaderCallbacks<EventsHolder> {
         @Override
         public Loader<EventsHolder> onCreateLoader(int i, Bundle bundle) {
-            cursor=sdatabase.query("Events",
-                    new String[]{"Name","ImageRes","EventKey"},
-                    null,null,
-                    null,null,
-                    null);
 
-            return new CusrorLoader(MainActivity.this,cursor);
+            return new CusrorLoader(MainActivity.this);
         }
 
         @Override
@@ -578,14 +573,19 @@ public class MainActivity extends AppCompatActivity
     private static class CusrorLoader extends AsyncTaskLoader<EventsHolder>{
         Cursor c;
         final EventsHolder holder;
-        CusrorLoader(Context context, Cursor cursor) {
+        CusrorLoader(Context context) {
             super(context);
-            this.c=cursor;
             holder = new EventsHolder();
         }
 
         @Override
         public EventsHolder loadInBackground() {
+
+            c=sdatabase.query("Events",
+                    new String[]{"Name","ImageRes","EventKey"},
+                    null,null,
+                    null,null,
+                    null);
 
             if (c != null) {
 
@@ -615,6 +615,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if(cursor!=null)
         cursor.close();
     }
 }

@@ -23,37 +23,14 @@ import static dawar.catchevent.CatchEvent.mdatabase;
 
 public class AlertsAdapter extends RecyclerView.Adapter<AlertsAdapter.AlertViewHolder> {
     private Context ctx;
-    private ArrayList<String> titles,captns,altKeys;
+    static ArrayList<String> captns,altKeys;
+    static ArrayList<String> titles;
 
     AlertsAdapter(Context context){
        ctx= context;
        captns=new ArrayList<>();
        titles=new ArrayList<>();
        altKeys=new ArrayList<>();
-    }
-
-    void swapCursor(Cursor cursor) {
-        if (cursor != null && cursor.getCount() > 0) {
-            cursor.moveToFirst();
-            do {
-                altKeys.add(cursor.getString(0));
-                mdatabase.child("Alerts").child(cursor.getString(0)).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        titles.add(Objects.requireNonNull(dataSnapshot.child("title").getValue()).toString());
-                        captns.add(Objects.requireNonNull(dataSnapshot.child("captn").getValue()).toString());
-                        AlertsAdapter.this.notifyDataSetChanged();
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-            }while (cursor.moveToNext());
-        }
-
     }
 
     @NonNull

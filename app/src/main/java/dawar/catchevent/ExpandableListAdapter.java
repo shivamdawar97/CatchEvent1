@@ -19,6 +19,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private Context context;
     private List<String> listDataHeader ;
     private HashMap<String,List<String>> listDataChild;
+
     ExpandableListAdapter(Context context, List<String> listDataHeader, HashMap<String, List<String>> listDataChild){
         this.context=context;
         this.listDataChild=listDataChild;
@@ -42,6 +43,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public Object getChild(int i, int i1) {
+
         return this.listDataChild.get(this.listDataHeader.get(i)).get(i1);
     }
 

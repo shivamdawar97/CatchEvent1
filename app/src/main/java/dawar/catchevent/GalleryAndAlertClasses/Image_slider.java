@@ -1,7 +1,5 @@
 package dawar.catchevent.GalleryAndAlertClasses;
 
-
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,17 +12,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.NetworkPolicy;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
 import dawar.catchevent.CatchEvent;
-import dawar.catchevent.GalleryAndAlertClasses.ImagesAdapter;
 import dawar.catchevent.R;
 
 
@@ -38,7 +30,7 @@ public class Image_slider extends Fragment {
         private ViewPager viewPager;
         private ArrayList<String> dates;
         private ArrayList<String> images,captns;
-        TextView dateview,counts,captn;
+        TextView counts,captn;
 
     public Image_slider() {
         // Required empty public constructor
@@ -50,7 +42,6 @@ public class Image_slider extends Fragment {
         // Inflate the layout for this fragment
         View view=inflater.inflate(R.layout.fragment_image_slider, container, false);
         viewPager=view.findViewById(R.id.gal_pager);
-        dateview=view.findViewById(R.id.idate);
         counts=view.findViewById(R.id.lbl_count);
         captn=view.findViewById(R.id.caption);
         relativeLayout=view.findViewById(R.id.slider_relative);
@@ -109,11 +100,14 @@ public class Image_slider extends Fragment {
                         container.removeView((ImageView) object);
                     }
                 });
+
                 viewPager.setCurrentItem(pos);
+                captn.setText(ImagesAdapter.captns.get(pos));
                 viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                     @Override
                     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                        counts.setText("" + (position + 1) + "/" + ImagesAdapter.captns.size());
+                        String s=String.valueOf(position+1)+"/"+String.valueOf(ImagesAdapter.images.size());
+                        counts.setText(s);
                         captn.setText(ImagesAdapter.captns.get(position));
                     }
 
@@ -133,7 +127,6 @@ public class Image_slider extends Fragment {
 
 
             {
-                dateview.setVisibility(View.INVISIBLE);
                 counts.setVisibility(View.INVISIBLE);
                 captn.setVisibility(View.INVISIBLE);
                 int pos=getArguments().getInt("img");

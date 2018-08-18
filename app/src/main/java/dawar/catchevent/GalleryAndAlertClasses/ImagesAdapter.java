@@ -36,34 +36,12 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ImagesView
 
     }
 
-    void swapCusor(Cursor cursor){
-
-        if(cursor!=null && cursor.getCount()>0) {
-            cursor.moveToFirst();
-            do {
-                Log.i("LogMessage","cursor recieved");
-                try {
-                    byte[] byteArray = cursor.getBlob(0);
-                    Bitmap bmp;
-
-                    if (byteArray != null && byteArray.length>0)
-                    {
-
-                        bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
-                        captns.add(cursor.getString(1));
-                        images.add(bmp);
-                        this.notifyDataSetChanged();
-                    }
-                }
-                catch (IllegalStateException e){
-                    e.printStackTrace();
-                }
-
-            }
-            while (cursor.moveToNext());
-        }
-
+     void updateDate(String captn,Bitmap image){
+        captns.add(captn);
+        images.add(image);
+        this.notifyDataSetChanged();
     }
+
     @NonNull
     @Override
     public ImagesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

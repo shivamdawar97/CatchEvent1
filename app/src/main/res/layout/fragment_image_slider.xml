@@ -27,26 +27,15 @@
         android:id="@+id/caption"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/idate"
         android:layout_alignParentStart="true"
         android:background="@color/trans_black"
         android:gravity="center"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="96dp"
         android:text="Caption"
         android:textColor="@color/cardview_light_background"
         android:textSize="25sp" />
 
-    <TextView
-        android:id="@+id/idate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="96dp"
-        android:background="@color/trans_black"
-        android:gravity="center"
-        android:text="Date"
-        android:textColor="@color/cardview_light_background"
-        android:textSize="17sp" />
 
 
 </RelativeLayout>

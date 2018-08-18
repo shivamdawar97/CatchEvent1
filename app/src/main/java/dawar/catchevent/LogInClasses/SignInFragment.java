@@ -190,26 +190,26 @@ public class SignInFragment extends Fragment {
         mUSerData = mdatabase.child("users");
 
 
-        mUSerData.addValueEventListener(new ValueEventListener() {
+        mUSerData.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.hasChild(id)) {
                     //Send user to Register Fragment
 
                     Boolean b=dataSnapshot.hasChild(id);
-                    Toast.makeText(activity,b.toString(),Toast.LENGTH_LONG).show();
+                    //Toast.makeText(activity,b.toString(),Toast.LENGTH_LONG).show();
                     mAuth.signOut();
                     user.delete();
                     if(LogInActivity.fragments.size()<3) {
                         Toast.makeText(activity, "Register first", Toast.LENGTH_LONG).show();
                         needAcc.callOnClick();
                     }
-                    else
-                        LogInActivity.viewPager.setCurrentItem(1,true);
+
                 }
                 else
                 {
                     Toast.makeText(activity,"log in Successful",Toast.LENGTH_LONG).show();
+                    activity.finish();
                 }
             }
             @Override

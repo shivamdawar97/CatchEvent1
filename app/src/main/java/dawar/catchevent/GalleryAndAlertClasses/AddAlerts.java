@@ -34,10 +34,11 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.UUID;
 
 import dawar.catchevent.R;
+
+import static dawar.catchevent.CatchEvent.getTime;
 
 public class AddAlerts extends AppCompatActivity {
     DatabaseReference mdata;
@@ -127,7 +128,8 @@ public class AddAlerts extends AppCompatActivity {
            newPost.child("desc").setValue(s);
 
            s=getIntent().getStringExtra("name");
-           s=s+"/n "+Calendar.getInstance().getTime().toString();
+
+           s=s+"\n "+getTime();
            newPost.child("captn").setValue(s);
 
            newPost.child("eventkey").setValue(postkey);
@@ -210,7 +212,7 @@ public class AddAlerts extends AppCompatActivity {
 
                                 bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),data.getData());
                                 bitmaps.add(0,bitmap);
-                                cptn[0]=cptn[0]+"\n"+Calendar.getInstance().getTime().toString()+
+                                cptn[0]=cptn[0]+"\n"+getTime()+
                                 "\n Event:"+getIntent().getStringExtra("name");
                                 captions.add(0,cptn[0]);
                             } catch (IOException e) {

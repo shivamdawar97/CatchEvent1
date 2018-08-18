@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -13,6 +14,8 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -26,10 +29,15 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Objects;
 
 import static dawar.catchevent.CatchEvent.mdatabase;
 import static dawar.catchevent.CatchEvent.sdatabase;
+import static dawar.catchevent.GalleryAndAlertClasses.GalleryProvider.ALL_ALERTS;
+import static dawar.catchevent.GalleryAndAlertClasses.GalleryProvider.ALL_IMAGES;
+import static dawar.catchevent.GalleryAndAlertClasses.GalleryProvider.EVENT_ALERTS;
+import static dawar.catchevent.GalleryAndAlertClasses.GalleryProvider.EVENT_IMAGES;
 
 public class LoaderClasses {
 
@@ -52,8 +60,6 @@ public class LoaderClasses {
         contentResolver=ctx.getContentResolver();
     }
 
-
-
     class FirebaseImageCallbacks implements LoaderManager.LoaderCallbacks {
 
         @NonNull
@@ -67,8 +73,9 @@ public class LoaderClasses {
 
         @Override
         public void onLoadFinished(@NonNull Loader loader, Object data) {
-
+            adapter.notifyDataSetChanged();
         }
+
 
         @Override
         public void onLoaderReset(@NonNull Loader loader) {
@@ -103,13 +110,14 @@ public class LoaderClasses {
                 InputStream input = connection.getInputStream();
                 bitmap = BitmapFactory.decodeStream(input);
 
-//                ImagesAdapter.images.add(bitmap);
-//                ImagesAdapter.captns.add(captn);
+                ImagesAdapter.captns.add(captn);
+                ImagesAdapter.images.add(bitmap);
 
                 //put Bitmap in Bundle
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
                 byte[] byteArray = stream.toByteArray();
+
 
                 ContentValues cv = new ContentValues();
                 cv.put("imgKey", ikey);
@@ -118,6 +126,7 @@ public class LoaderClasses {
                 cv.put("eventKey", ekey);
 
                 contentResolver.insert(GalleryProvider.Content_Uri_1,cv);
+
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -181,47 +190,51 @@ public class LoaderClasses {
         }
     }
 
-   public class GalleryCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
+   public class GalleryCallbacks implements LoaderManager.LoaderCallbacks<HashMap<String,Bitmap>> {
 
         @NonNull
         @Override
 
-        public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
+        public Loader<HashMap<String,Bitmap>> onCreateLoader(int id, @Nullable Bundle args) {
 
-            CursorLoader cursorLoader = new CursorLoader(ctx);
+            MyCursorLoader cursorLoader = new MyCursorLoader(ctx);
             int type = Objects.requireNonNull(args).getInt("type");
+
+
             switch (type) {
 
-                case GalleryProvider.ALL_IMAGES:
+                case ALL_IMAGES:
 
                     cursorLoader.setProjection(new String[]{"bytes", "captn"});
-                    cursorLoader.setUri(GalleryProvider.Content_Uri_1);
+                    cursorLoader.setContentType(type);
+                    cursorLoader.setSelection(null);
+                    cursorLoader.setSelectionArgs(null);
 
                     break;
 
-                case GalleryProvider.EVENT_IMAGES:
+                case EVENT_IMAGES:
 
                     cursorLoader.setProjection(new String[]{"bytes", "captn"});
                     cursorLoader.setSelection("eventKey=?");
                     cursorLoader.setSelectionArgs(new String[]{args.getString("eventKey")});
-                    cursorLoader.setUri(GalleryProvider.Content_Uri_2);
-                    cursorLoader.setSortOrder(null);
+                    cursorLoader.setContentType(type);
+
 
                     break;
 
-                case GalleryProvider.ALL_ALERTS:
+                case ALL_ALERTS:
 
                     cursorLoader.setProjection(new String[]{"altKey"});
-                    cursorLoader.setUri(GalleryProvider.Content_Uri_3);
+                    cursorLoader.setContentType(type);
 
                     break;
 
-                case GalleryProvider.EVENT_ALERTS:
+                case EVENT_ALERTS:
 
                     cursorLoader.setProjection(new String[]{"altKey"});
                     cursorLoader.setSelection("eventKey=?");
                     cursorLoader.setSelectionArgs(new String[]{args.getString("eventKey")});
-                    cursorLoader.setUri(GalleryProvider.Content_Uri_4);
+                    cursorLoader.setContentType(type);
 
                     break;
 
@@ -231,40 +244,129 @@ public class LoaderClasses {
         }
 
         @Override
-        public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
-
-            if(adapter!=null)
-                adapter.swapCusor(data);
-            else
-                alertsAdapter.swapCursor(data);
-
+        public void onLoadFinished(@NonNull Loader<HashMap<String,Bitmap>> loader, HashMap<String,Bitmap> data) {
+              if(data!=null)
+                for(String s: data.keySet()){
+                    adapter.updateDate(s,data.get(s));
+                }
+                else
+                    alertsAdapter.notifyDataSetChanged();
         }
 
-
         @Override
-        public void onLoaderReset(@NonNull Loader<Cursor> cursor) {
-            adapter.swapCusor(null);
+        public void onLoaderReset(@NonNull Loader<HashMap<String,Bitmap>> cursor) {
+
         }
 
     }
 
 
+    private static class MyCursorLoader extends AsyncTaskLoader<HashMap<String,Bitmap>> {
+
+        int contentType;
+        String[] projection, selectionArgs;
+        String selection; //sortOrder;
+        HashMap<String,Bitmap> hashMap;
+
+
+        MyCursorLoader(@NonNull Context context) {
+            super(context);
+        }
+
+        public void setContentType(int contentType) {
+            this.contentType = contentType;
+        }
+
+        public void setProjection(String[] projection) {
+            this.projection = projection;
+        }
+
+        public void setSelectionArgs(String[] selectionArgs) {
+            this.selectionArgs = selectionArgs;
+        }
+
+        public void setSelection(String selection) {
+            this.selection = selection;
+        }
+
+
+        @Nullable
+        @Override
+        public HashMap<String,Bitmap> loadInBackground() {
+            Cursor cursor;
+            hashMap=new HashMap<>();
+
+            switch (contentType)
+            {
+                case  ALL_IMAGES:
+                case EVENT_IMAGES:
+
+
+                    Log.i("In Background","Reached here");
+                    cursor=sdatabase.query("Gallery",projection,selection,selectionArgs,null,null,null);
+
+                    if(cursor!=null && cursor.getCount()>0) {
+                        cursor.moveToFirst();
+                        do {
+
+                            try {
+                                byte[] byteArray = cursor.getBlob(0);
+                                Bitmap bmp;
+
+                                if (byteArray != null && byteArray.length>0)
+                                {
+
+                                    bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+                                    hashMap.put(cursor.getString(1),bmp);
+
+                                }
+                            }
+                            catch (IllegalStateException e){
+                                e.printStackTrace();
+                            }
+
+                        }
+                        while (cursor.moveToNext());
+                    }
+                    Objects.requireNonNull(cursor).close();
+                    return hashMap;
+
+                case ALL_ALERTS:
+                case EVENT_ALERTS:
+
+                    cursor=sdatabase.query("Alerts",projection,selection,selectionArgs,null,null,null);
+                    if (cursor != null && cursor.getCount() > 0) {
+                        cursor.moveToFirst();
+                        do {
+
+                            AlertsAdapter.altKeys.add(cursor.getString(0));
+                            mdatabase.child("Alerts").child(cursor.getString(0)).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    AlertsAdapter.titles.add(Objects.requireNonNull(dataSnapshot.child("title").getValue()).toString());
+                                    AlertsAdapter.captns.add(Objects.requireNonNull(dataSnapshot.child("captn").getValue()).toString());
+
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+                        }while (cursor.moveToNext());
+                    }
+                    Objects.requireNonNull(cursor).close();
+                    return null;
+            }
+
+            return null;
+        }
+
+    }
+
 }
-     /*
-     TODO:Later Experiment.
-     private static class GalleryLoader extends CursorLoader{
 
-         public GalleryLoader(@NonNull Context context, @NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
-             super(context, uri, projection, selection, selectionArgs, sortOrder);
-         }
 
-         @Override
-         public Cursor loadInBackground() {
-             return super.loadInBackground();
-         }
 
-     }
-
-     */
 
 

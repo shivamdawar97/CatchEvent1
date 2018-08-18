@@ -17,6 +17,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Objects;
 
 import dawar.catchevent.GalleryAndAlertClasses.LoaderClasses;
@@ -76,5 +77,15 @@ public class CatchEvent extends Application {
         s = Objects.requireNonNull(dataSnapshot.child("captn").getValue()).toString();
         bundle.putString("captn", s);
         return bundle;
+    }
+    public  static String getTime(){
+        String date= Calendar.getInstance().getTime().toString();
+
+        int index=Integer.parseInt(date.substring(30));
+        index++;
+        date=date.split(String.valueOf("G"),9)[0];
+
+        date=date.concat(String.valueOf(index));
+        return date;
     }
 }

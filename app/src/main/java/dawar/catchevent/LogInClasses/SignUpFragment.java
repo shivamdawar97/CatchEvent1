@@ -34,7 +34,10 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -253,10 +256,31 @@ public class SignUpFragment extends Fragment {
         mAuth.signInWithCredential(credential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
+
                 if(task.isSuccessful()){
-                    Toast.makeText(activity,"Login successfully",Toast.LENGTH_SHORT).show();
-                    FirebaseUser user=mAuth.getCurrentUser();
-                    updateDatabase(Objects.requireNonNull(user),card);
+                    final FirebaseUser user=mAuth.getCurrentUser();
+                    mdatabase.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if(dataSnapshot.hasChild(user.getUid())){
+                                mAuth.signOut();
+                                Toast.makeText(activity,"user already exists",Toast.LENGTH_SHORT).show();
+                                activity.finish();
+                            }
+                            else{
+                                 Toast.makeText(activity,"Login successfully",Toast.LENGTH_SHORT).show();
+                                updateDatabase(Objects.requireNonNull(user),card);
+                            }
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+
 
                 }
                 else {
