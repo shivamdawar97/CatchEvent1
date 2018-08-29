@@ -1,9 +1,7 @@
-package dawar.catchevent;
+package dawar.catchevent.EventClasses;
 
-
-import android.app.AlertDialog;
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -18,41 +16,51 @@ import android.support.v7.widget.Toolbar;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Objects;
+
+import dawar.catchevent.R;
+
+import static dawar.catchevent.CatchEvent.Uid;
+
+import static dawar.catchevent.CatchEvent.getCompressed;
+import static dawar.catchevent.CatchEvent.mdatabase;
+import static dawar.catchevent.CatchEvent.mstorage;
 
 public class AddEvent extends AppCompatActivity {
     ImageButton imageView;
     EditText ed1,ed2,ed3,ed4,ed5,ed6,ed7,ed8,ed9;
     private Uri filepath;
     public static final int PICK=234;
-    private String U1,U2;
-    int cl,ch;//is cl for parent event (Udbhav/Spardha) and ch-->is for whether it is a special event or not
-    private StorageReference mStorageRef;
+    Bitmap bitmap;
+  //  private String U1,U2;
+  //  int cl,ch;//is cl for parent event (Udbhav/Spardha) and ch-->is for whether it is a special event or not
     private ProgressDialog pd;
-    DatabaseReference mDatabaseRef;
 
+    @SuppressLint("ClickableViewAccessibility")
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_event);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar =  findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        mStorageRef= FirebaseStorage.getInstance().getReference();
-        mDatabaseRef= FirebaseDatabase.getInstance().getReference();
 
         imageView=findViewById(R.id.add_event_image);
        // View view=getLayoutInflater().inflate(R.layout.content_add_event,null);
@@ -76,77 +84,12 @@ public class AddEvent extends AppCompatActivity {
                         view.getParent().requestDisallowInterceptTouchEvent(false);
                         return true;
                     case MotionEvent.ACTION_BUTTON_PRESS:
-                        InputMethodManager imm = (InputMethodManager) getSystemService(AddEvent.this.INPUT_METHOD_SERVICE);
-                        imm.showSoftInput(ed4, InputMethodManager.SHOW_IMPLICIT);
+                        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                        Objects.requireNonNull(imm).showSoftInput(ed4, InputMethodManager.SHOW_IMPLICIT);
                 }
                 return false;
             }
         });
-
-        final AlertDialog.Builder alert =new AlertDialog.Builder(this);
-        alert.setCancelable(false);
-        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice);
-        alert.setTitle("Select One:-");
-
-        arrayAdapter.add("Udbhav");
-        arrayAdapter.add("Spardha");
-        arrayAdapter.add("Other");
-
-        alert.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                finish();
-            }
-        });
-
-        alert.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-               cl=i;
-                switch (i){
-                    case 0:
-
-                        U1=arrayAdapter.getItem(i);
-                        AlertDialog.Builder builder2=new AlertDialog.Builder(AddEvent.this);
-                        builder2.setCancelable(false);
-                        arrayAdapter.clear();
-                        arrayAdapter.add("Day1");
-                        arrayAdapter.add("Day2");
-                        arrayAdapter.add("Day3");
-                        final CheckBox checkBox=new CheckBox(AddEvent.this);
-                        checkBox.setText("Is it a Special Event");
-                        builder2.setView(checkBox);
-                        builder2.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i2) {
-                                            U2=arrayAdapter.getItem(i2);
-                                            boolean p=checkBox.isChecked();
-                                            if(p){
-                                                ch=1;
-                                            }
-                                            else {
-                                                ch=0;
-                                            }
-                            }
-                        });
-
-                            builder2.show();
-
-                        break;
-                    case 1:
-
-                        break;
-
-                    case 2:
-                        break;
-
-
-                }
-            }
-        });
-        alert.show();
-
     }
 
 
@@ -157,9 +100,12 @@ public class AddEvent extends AppCompatActivity {
             filepath=data.getData();
             try {
 
-                Bitmap bitmap= MediaStore.Images.Media.getBitmap( getContentResolver(),filepath);
+                 bitmap= MediaStore.Images.Media.getBitmap( getContentResolver(),filepath);
+                 //URI uri=new URI(filepath.toString());
+                 bitmap=getCompressed(bitmap);
+
                 imageView.setImageBitmap(bitmap);
-            } catch (IOException e) {
+            } catch (IOException /*| URISyntaxException */e) {
                 e.printStackTrace();
             }
         }
@@ -184,24 +130,31 @@ public class AddEvent extends AppCompatActivity {
         final String s7=ed7.getText().toString().trim();
         final String s8=ed8.getText().toString().trim();
         final String s9=ed9.getText().toString();
-        if(filepath!=null && s1!=null && s2!=null && s3!=null && s4!=null && s9!=null)
+
+        if(filepath != null && s2 != null && s3 != null && s4 != null && s9 != null)
         {
-            StorageReference riversRef = mStorageRef.child("images").child(s1).child(filepath.getLastPathSegment());
+            StorageReference riversRef = mstorage.child("images").child(s1).child(filepath.getLastPathSegment());
             pd.setTitle("Updating The Event Details...");
             pd.show();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
 
-            riversRef.putFile(filepath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            final byte[] data1 = baos.toByteArray();
+
+            riversRef.putBytes(data1).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     @SuppressWarnings("VisibleForTests") final Uri dnldurl=taskSnapshot.getDownloadUrl();
 
-                    DatabaseReference newPost=mDatabaseRef.child("Events").push();
+                    final DatabaseReference newPost=mdatabase.child("Events").push();
+                    newPost.child("image").setValue(Objects.requireNonNull(dnldurl).toString());
                     newPost.child("name").setValue(s1);
                     newPost.child("date").setValue(s2);
                     newPost.child("time").setValue(s3);
                     newPost.child("desc").setValue(s4);
                     newPost.child("venue").setValue(s9);
-                    newPost.child("image").setValue(dnldurl.toString());
+
+
                     if(!s5.equals("")){
                         newPost.child("regfee").setValue(s5);
                     }if(!s6.equals("")){
@@ -211,26 +164,26 @@ public class AddEvent extends AppCompatActivity {
                     } if(!s8.equals("")){
                         newPost.child("thrdpz").setValue(s8);
                     }
-                    switch (cl){
-                        case 0:
-                            mDatabaseRef.child(U1).child(U2).push().setValue(newPost.getKey());
-                            if(ch==1)
-                                mDatabaseRef.child(U1).child("Special").push().setValue(newPost.getKey());
-                            break;
-                        case 1:
-                            break;
-                        case 3:
-                            break;
-                    }
 
 
+                    mdatabase.child("users").child(Uid).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            newPost.child("organiser").child(Uid).setValue(dataSnapshot.child("username").getValue());
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                    mdatabase.child("users").child(Uid).child("events")
+                            .child(newPost.getKey()).setValue(s1);
                     pd.dismiss();
                     Toast.makeText(AddEvent.this,"Event Created",Toast.LENGTH_LONG).show();
                     finish();
                 }
             });
-
-
         }
         else
         {

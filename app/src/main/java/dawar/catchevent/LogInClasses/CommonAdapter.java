@@ -2,6 +2,7 @@ package dawar.catchevent.LogInClasses;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.IntentService;
 import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -31,6 +32,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import dawar.catchevent.CatchEvent;
 import dawar.catchevent.R;
 
 /**
@@ -41,13 +43,12 @@ public  class CommonAdapter  {
     public static int  RC_SIGN_IN = 10;
     public static int RC_SIGN_UP=11;
     public static GoogleApiClient mgoogleApiClient;
-    public static Context ctx;
+    static Context context;
     private static  GoogleSignInOptions gso;
 
 
     CommonAdapter(final Context ctx){
-        this.ctx=ctx;
-
+        context=ctx;
         gso= new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                  .requestIdToken(ctx.getString(R.string.default_web_client_id))
                  .requestEmail()
@@ -75,7 +76,7 @@ public  class CommonAdapter  {
             }
             else {
 
-                Toast.makeText(ctx,"LogIn Failed",Toast.LENGTH_SHORT).show();
+                Toast.makeText(context,"LogIn Failed",Toast.LENGTH_SHORT).show();
 
             }
         }

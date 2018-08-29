@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,14 +35,17 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.UUID;
 
 import dawar.catchevent.R;
 
+import static dawar.catchevent.CatchEvent.getCompressed;
 import static dawar.catchevent.CatchEvent.getTime;
+import static dawar.catchevent.CatchEvent.mdatabase;
 
 public class AddAlerts extends AppCompatActivity {
-    DatabaseReference mdata;
+
     String postkey;
     EditText title,desc;
     RecyclerView recycler;
@@ -49,12 +53,13 @@ public class AddAlerts extends AppCompatActivity {
     ArrayList<Bitmap> bitmaps;
     ArrayList<String> captions;
     private StorageReference riversRef;
+   // int success=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_alerts);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -65,16 +70,15 @@ public class AddAlerts extends AppCompatActivity {
         postkey=getIntent().getStringExtra("name");
         riversRef= FirebaseStorage.getInstance().getReference().child("images")
         .child(postkey);
-        actionBar.setTitle("Add an Alert>>"+postkey);
+        actionBar.setTitle("Add Alert>"+postkey);
         related.append("\n "+postkey);
         postkey=getIntent().getStringExtra("key");
-
 
         bitmaps=new ArrayList<>();
         captions=new ArrayList<>();
 
         recycler=findViewById(R.id.alert_recycler);
-        mdata = FirebaseDatabase.getInstance().getReference();
+
         // ArrayAdapter aa = new ArrayAdapter(this, android.R.layout.simple_list_item_1,);
         // aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // spinner.setAdapter(aa);
@@ -117,7 +121,7 @@ public class AddAlerts extends AppCompatActivity {
        {
            pd.setTitle("Please wait...");
            pd.show();
-           DatabaseReference newPost=mdata.child("Alerts").push();
+           DatabaseReference newPost=mdatabase.child("Alerts").push();
 
             String s = title.getText().toString();
            newPost.child("title").setValue(s);
@@ -140,13 +144,7 @@ public class AddAlerts extends AppCompatActivity {
            for(int i=0;i<bitmaps.size();i++){
 
                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-               if(bitmaps.get(i).getByteCount()>1024) {
-                   bitmaps.get(i).compress(Bitmap.CompressFormat.JPEG, 40, baos);
-               }
-               else {
-                   bitmaps.get(i).compress(Bitmap.CompressFormat.JPEG, 60, baos);
-
-               }
+               bitmaps.get(i).compress(Bitmap.CompressFormat.JPEG, 100, baos);
                final byte[] data1 = baos.toByteArray();
                final int finalI = i;
                final DatabaseReference finalNewPost = newPost;
@@ -155,31 +153,39 @@ public class AddAlerts extends AppCompatActivity {
                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                        @SuppressWarnings("VisibleForTests")
                        final Uri dnldurl=taskSnapshot.getDownloadUrl();
-                       DatabaseReference newpost1=mdata.child("Gallery").push();
+
+                       DatabaseReference newpost1=mdatabase.child("Gallery").push();
+
                        newpost1.child("url").setValue(dnldurl.toString());
                        newpost1.child("captn").setValue(captions.get(finalI));
                        newpost1.child("eventKey").setValue(postkey);
+
+
                        String s =newpost1.getKey();
-                      // newpost1=mdata.child("Events").child(postkey).child("Gallery").push();
-                      // newpost1.setValue(s);
-                       finalNewPost.push().setValue(s);
+                       mdatabase.child("Events").child(postkey).child("Gallery")
+                               .child(s).setValue(dnldurl.toString());
+                       finalNewPost.child(s).setValue(dnldurl.toString());
+
                    }
                }).addOnFailureListener(new OnFailureListener() {
                    @Override
                    public void onFailure(@NonNull Exception e) {
+                      // success=1;
                        Toast.makeText(AddAlerts.this,"Uploadation Failed",Toast.LENGTH_SHORT).show();
                    }
                });
 
            }
-           newPost=mdata.child("Events").child(postkey).child("Alerts").push();
-           newPost.setValue(s).addOnCompleteListener(new OnCompleteListener<Void>() {
-               @Override
-               public void onComplete(@NonNull Task<Void> task) {
-                   pd.dismiss();
-                   finish();
-               }
-           });
+               newPost=mdatabase.child("Events").child(postkey).child("Alerts").child(s);
+               newPost.setValue(title.getText().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                   @Override
+                   public void onComplete(@NonNull Task<Void> task) {
+                       pd.dismiss();
+                       finish();
+                   }
+               });
+
+
        }
     }
 
@@ -205,12 +211,12 @@ public class AddAlerts extends AppCompatActivity {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                         cptn[0]=caption.getText().toString();
-                        if(!cptn[0].isEmpty()){
                             dialogInterface.dismiss();
                             Bitmap bitmap;
                             try {
 
                                 bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),data.getData());
+                                bitmap=getCompressed(bitmap);
                                 bitmaps.add(0,bitmap);
                                 cptn[0]=cptn[0]+"\n"+getTime()+
                                 "\n Event:"+getIntent().getStringExtra("name");
@@ -220,10 +226,7 @@ public class AddAlerts extends AppCompatActivity {
                             }
                             recycler.getAdapter().notifyDataSetChanged();
                             dialogInterface.dismiss();
-                        }
-                        else {
-                            Toast.makeText(AddAlerts.this,"Caption not provided",Toast.LENGTH_SHORT).show();
-                        }
+
                 }
             });
             builder.show();

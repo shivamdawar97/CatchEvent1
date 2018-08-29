@@ -27,7 +27,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -64,6 +63,7 @@ import java.util.Calendar;
 import java.util.UUID;
 import dawar.catchevent.GalleryAndAlertClasses.GalleryActivity;
 import dawar.catchevent.LogInClasses.LogInActivity;
+import dawar.catchevent.SettingsClasses.SettingsActivity;
 
 
 import static dawar.catchevent.CatchEvent.mdatabase;
@@ -78,9 +78,9 @@ public class MainActivity extends AppCompatActivity
 
     Cursor cursor;
     android.support.v4.app.FragmentTransaction ft;
-    ArrayList<String> titles;
-    ArrayList<String> Events;
+    ArrayList<String> titles,Events;
     ArrayList<Bitmap> images;
+
 
     private FirebaseAuth mAuth;
     int i=0;
@@ -126,19 +126,29 @@ public class MainActivity extends AppCompatActivity
          mdatabase.child("Events").addChildEventListener(new ChildEventListener() {
              @Override
              public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                 s=dataSnapshot.child("name").getValue().toString();
-                 if(titles==null || !titles.contains(s))
-                 {
-                     Log.i("Firebase ", "Reached Here " + s);
-                     String oneTitle=s;
-                     s = dataSnapshot.child("image").getValue().toString();
-                     Bundle bundle=new Bundle();
-                     bundle.putString("title",oneTitle);
-                     bundle.putString("url",s);
-                     bundle.putString("key",dataSnapshot.getKey());
-                     getLoaderManager().initLoader(i,bundle,new FirebaseCallbacks()).forceLoad();
-                     i++;
-                 }
+              try {
+
+                  s=dataSnapshot.getKey();
+                  if(Events==null || !Events.contains(s))
+                  {
+                      Bundle bundle=new Bundle();
+                      bundle.putString("key",s);
+
+                      s = dataSnapshot.child("image").getValue().toString();
+                      bundle.putString("url",s);
+
+                      s=dataSnapshot.child("name").getValue().toString();
+                      bundle.putString("title",s);
+
+                      getLoaderManager().initLoader(i,bundle,new FirebaseCallbacks()).forceLoad();
+                      i++;
+                  }
+              }catch (NullPointerException e){
+                 e.printStackTrace();
+                 // finish();
+                //  startActivity(getIntent());
+              }
+
              }
 
              @Override
@@ -203,8 +213,7 @@ public class MainActivity extends AppCompatActivity
         muser=mAuth.getCurrentUser();
         if(muser==null)
         {
-            MenuItem item=menu.findItem(R.id.action_logout);
-            item.setVisible(false);
+            MenuItem item;
             item=menu.findItem(R.id.action_settings);
             item.setVisible(false);
         }
@@ -226,7 +235,7 @@ public class MainActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
 
-            Intent i=new Intent(MainActivity.this,ListActivity.class);
+            Intent i=new Intent(MainActivity.this,SettingsActivity.class);
             i.putExtra("sett",-1);
             startActivity(i);
             return true;
@@ -235,17 +244,6 @@ public class MainActivity extends AppCompatActivity
         if(id == R.id.action_login){
             startActivity(new Intent(MainActivity.this, LogInActivity.class));
             return true;
-        }
-        if(id==R.id.action_logout){
-            if(muser!=null) {
-                mAuth.signOut();
-                Snackbar.make(getCurrentFocus(), "Logged Out Successfully", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-            }
-            else    {
-                Snackbar.make(getCurrentFocus(), "You are not Logged In", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-
-            }
-
         }
 
         return super.onOptionsItemSelected(item);
@@ -267,6 +265,7 @@ public class MainActivity extends AppCompatActivity
                 Toast.makeText(MainActivity.this, "You are not Registered", Toast.LENGTH_SHORT).show();
 
             } else {
+
                 AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this);
                 ab.setTitle("Choose Image Source:");
                 ab.setPositiveButton("CAMERA", new DialogInterface.OnClickListener() {
@@ -476,7 +475,7 @@ public class MainActivity extends AppCompatActivity
                 Events.add(bundle.getString("key"));
                 recyclerAdapter.updateData(titles,images,Events);
                 recyclerAdapter.notifyDataSetChanged();
-                ((CatchEvent)MainActivity.this.getApplication()).updateData(titles,images,Events);
+                CatchEvent.updateData(titles,images,Events);
 
             }catch (Exception e){
                 e.printStackTrace();
@@ -502,6 +501,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         public Bundle loadInBackground() {
             Bundle b=new Bundle();
+
             try {
                 Bitmap bitmap;
                 //download image from url
@@ -513,11 +513,12 @@ public class MainActivity extends AppCompatActivity
                 InputStream input = connection.getInputStream();
                 bitmap = BitmapFactory.decodeStream(input);
 
+
                 //put Bitmap in byteArray
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                byte[] byteArray = stream.toByteArray();
 
+                byte[] byteArray = stream.toByteArray();
 
                 ContentValues cv=new ContentValues();
                 cv.put("Name",s1);
@@ -528,11 +529,8 @@ public class MainActivity extends AppCompatActivity
                 b.putByteArray("image",byteArray);
                 b.putString("title",s1);
                 b.putString("key",s3);
-
-
-
-
                 return b;
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -550,12 +548,13 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onLoadFinished(Loader<EventsHolder> loader, EventsHolder holder) {
             try {
+
                 titles.addAll(holder.Titles);
                 images.addAll(holder.imgs);
                 Events.addAll(holder.keys);
                 recyclerAdapter.updateData(titles,images,Events);
                 recyclerAdapter.notifyDataSetChanged();
-                ((CatchEvent)MainActivity.this.getApplication()).updateData(titles,images,Events);
+                CatchEvent.updateData(titles,images,Events);
                 initiateFirebaseLoaders();
 
             }catch (Exception e){
@@ -587,20 +586,28 @@ public class MainActivity extends AppCompatActivity
                     null,null,
                     null);
 
-            if (c != null) {
+            if (c != null ) {
 
                 if (c.moveToFirst()) {
                     do {
-                        holder.Titles.add(c.getString(0));
+
+                        try{
+
+                            holder.Titles.add(c.getString(0));
+                            byte[] image=c.getBlob(1);
+                            Bitmap bitmap=BitmapFactory.decodeByteArray(image,0,image.length);
+                            holder.imgs.add(bitmap);
+                            holder.keys.add(c.getString(2));
+
+                        }catch (IllegalStateException e){
+                            e.printStackTrace();
+                        }
                         /*If file cursor have filepath
                          File image = new File( c.getString(1));
                           BitmapFactory.Options bmOptions = new BitmapFactory.Options();
                         Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions);
                            */
-                        byte[] image=c.getBlob(1);
-                        Bitmap bitmap=BitmapFactory.decodeByteArray(image,0,image.length);
-                        holder.imgs.add(bitmap);
-                        holder.keys.add(c.getString(2));
+
 
                     } while (c.moveToNext());
                 }

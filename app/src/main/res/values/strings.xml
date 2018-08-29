@@ -30,4 +30,6 @@
     <string name="sign_in">Sign in</string>
     <string name="dont_account">Don\'t have an Account?</string>
     <string name="back"><u>Back</u></string>
+    <string name="next">next</string>
+    <string name="event">event</string>
 </resources>

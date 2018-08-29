@@ -31,7 +31,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DataSnapshot;
@@ -49,7 +48,7 @@ import dawar.catchevent.MainActivity;
 import dawar.catchevent.R;
 
 import static android.app.Activity.RESULT_OK;
-import static dawar.catchevent.AddEvent.PICK;
+import static dawar.catchevent.EventClasses.AddEvent.PICK;
 import static dawar.catchevent.CatchEvent.mdatabase;
 import static dawar.catchevent.CatchEvent.mstorage;
 import static dawar.catchevent.CatchEvent.mAuth;
@@ -77,7 +76,7 @@ public class SignUpFragment extends Fragment {
 
     Bitmap bitmap;
     FragmentActivity activity;
-    private Boolean retn;
+
 
     public SignUpFragment() {
         // Required empty public constructor
@@ -139,7 +138,7 @@ public class SignUpFragment extends Fragment {
             filepath=data.getData();
             try {
 
-                bitmap= MediaStore.Images.Media.getBitmap( LogInActivity.contentResolver,filepath);
+                bitmap= MediaStore.Images.Media.getBitmap( activity.getContentResolver(),filepath);
                 imageCard.setImageBitmap(bitmap);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -150,27 +149,49 @@ public class SignUpFragment extends Fragment {
 
     private class ClickListener implements View.OnClickListener {
         @Override
-        public void onClick(View view) {
+        public void onClick(final View view) {
+            email=editEmail.getText().toString().trim();
 
-            if(view.getId()==R.id.button5){
+            if(TextUtils.isEmpty(email))
+            {   Toast.makeText(activity,"provide username",Toast.LENGTH_LONG).show();
+                return;}
+            mdatabase.child("usernames").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if(!dataSnapshot.hasChild(email))
+                        {
+                            if(view.getId()==R.id.button5) {
+                                createUser(card);
+                            }
+                            if(view.getId()==R.id.googlebtn){
 
-                 createUser(card);
-            }
+                                if(TextUtils.isEmpty(editName.getText().toString().trim()) || filepath==null){
+                                    Toast.makeText(activity,"provide name and image",Toast.LENGTH_LONG).show();
+                                    return;
+                                }
 
-            if(view.getId()==R.id.googlebtn){
+                                new CommonAdapter(activity);
+                                Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mgoogleApiClient);
+                                (activity).startActivityForResult(signInIntent, RC_SIGN_UP);
+                                mgoogleApiClient.stopAutoManage( activity);
+                                mgoogleApiClient.disconnect();
 
-                if(TextUtils.isEmpty(editName.getText().toString().trim()) || filepath==null){
-                    Toast.makeText(activity,"provide name and image",Toast.LENGTH_LONG).show();
-                    return;
-                }
+                            }
+                        }
 
-                new CommonAdapter(activity);
-                Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mgoogleApiClient);
-                (activity).startActivityForResult(signInIntent, RC_SIGN_UP);
-                mgoogleApiClient.stopAutoManage( activity);
-                mgoogleApiClient.disconnect();
+                        else
+                            Toast.makeText(activity,"username already exists",Toast.LENGTH_LONG).show();
+                    }
 
-            }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+
+
+
         }
 
     }
@@ -178,7 +199,6 @@ public class SignUpFragment extends Fragment {
     private void createUser(final int userType){
 
         name=editName.getText().toString().trim();
-        email=editEmail.getText().toString().trim();
         password=editPass.getText().toString().trim();
         cpassword=editcPass.getText().toString().trim();
 
@@ -188,9 +208,11 @@ public class SignUpFragment extends Fragment {
 
             if(password.matches(cpassword)){
 
+
                 mProgressDialog=new ProgressDialog(getContext());
                 mProgressDialog.setTitle("Creating Account...");
                 mProgressDialog.show();
+                email= email.concat("@catchevent.com");
                 mAuth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(Objects.requireNonNull(activity), new OnCompleteListener<AuthResult>() {
                             @Override
@@ -220,9 +242,14 @@ public class SignUpFragment extends Fragment {
     private void updateDatabase(final FirebaseUser user,int userType) {
 
         String uid = user.getUid();
+        String username;
+        name=editName.getText().toString().trim();
+        username=editEmail.getText().toString();
+        mdatabase.child("usernames").child(username).setValue(uid);
         mUserdata=  mdatabase.child("users").child(uid);
         mUserdata.child("name").setValue(name);
         mUserdata.child("userType").setValue(userType);
+        mUserdata.child("username").setValue(username);
         mUserStorage=mstorage.child("users").child(uid).child(filepath.getLastPathSegment());
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         if(bitmap.getByteCount()>1024) {
@@ -262,7 +289,7 @@ public class SignUpFragment extends Fragment {
                     mdatabase.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            if(dataSnapshot.hasChild(user.getUid())){
+                            if(dataSnapshot.hasChild(Objects.requireNonNull(user).getUid())){
                                 mAuth.signOut();
                                 Toast.makeText(activity,"user already exists",Toast.LENGTH_SHORT).show();
                                 activity.finish();
@@ -270,6 +297,7 @@ public class SignUpFragment extends Fragment {
                             else{
                                  Toast.makeText(activity,"Login successfully",Toast.LENGTH_SHORT).show();
                                 updateDatabase(Objects.requireNonNull(user),card);
+                                activity.finish();
                             }
 
                         }

@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:id="@+id/frag_ubv"
     android:background="@drawable/frag_back"
-    tools:context="dawar.catchevent.UdbhavFragment">
+    tools:context="dawar.catchevent.UdbhavClasses.UdbhavFragment">
 
     <ImageView
         android:id="@+id/imageView"

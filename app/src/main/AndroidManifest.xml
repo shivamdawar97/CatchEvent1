@@ -26,40 +26,33 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".AddEvent"
+            android:name=".EventClasses.AddEvent"
             android:label="@string/title_activity_add_event"
-            android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".EventDetail"
-            android:label="@string/title_activity_event_detail"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:name=".EventClasses.EventDetail"
+            android:label="@string/title_activity_event_detail" />
         <activity android:name=".GalleryAndAlertClasses.GalleryActivity" />
-        <activity
-            android:name=".ListActivity"
-            android:label="@string/title_activity_list"
-            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".SettingsClasses.SettingsActivity" />
         <activity
             android:name=".GalleryAndAlertClasses.AddAlerts"
-            android:label="@string/title_activity_add_alerts"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/title_activity_add_alerts" />
         <activity android:name=".GalleryAndAlertClasses.AlertDetails" />
         <activity
             android:name=".Splash"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:label="@string/app_name" />
         <activity
             android:name=".AboutUs"
-            android:label="@string/title_activity_about_us"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".UdbhavMainActivity" />
-        <activity android:name=".LogInClasses.LogInActivity"></activity>
+            android:label="@string/title_activity_about_us" />
+        <activity android:name=".UdbhavClasses.UdbhavMainActivity" />
+        <activity android:name=".LogInClasses.LogInActivity" />
 
         <provider
-            android:authorities="dawar.catchevent.GalleryAndAlertClasses"
             android:name=".GalleryAndAlertClasses.GalleryProvider"
-            android:exported="false"
-            />
+            android:authorities="dawar.catchevent.GalleryAndAlertClasses"
+            android:exported="false" />
+
+        <activity android:name=".EventClasses.UpdateEvent"></activity>
     </application>
 
 </manifest>

@@ -15,10 +15,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         String SQL_CREATE_TABLE;
         final String SQL_CREATE_PLACES_TABLE = "CREATE TABLE Events" + " (" +
-                "id_ INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "EventKey TEXT Primary key ,"+
                 "Name TEXT ,"+
-                " ImageRes BLOB NOT NULL, " +
-                "EventKey TEXT"+
+                " ImageRes BLOB NOT NULL " +
                 "); ";
 
         sqLiteDatabase.execSQL(SQL_CREATE_PLACES_TABLE);

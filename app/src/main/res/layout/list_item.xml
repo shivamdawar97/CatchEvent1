@@ -2,19 +2,32 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
 
     <TextView
         android:id="@+id/final_list_item"
-        android:textColor="@color/cardview_light_background"
-        android:textStyle="italic"
-        android:textSize="19sp"
-        android:layout_width="match_parent"
+        android:textSize="20sp"
+        android:layout_marginStart="20dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
-        android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft"
+        android:textColor="#000"
+        android:text="@string/event"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        android:layout_gravity="center"
+        />
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+    <ImageView
+        android:layout_width="wrap_content"
+        android:contentDescription="@string/next"
+        android:layout_height="wrap_content"
+        android:src="@drawable/rightarrow"
+        android:layout_gravity="center"
         />
 
 </LinearLayout>

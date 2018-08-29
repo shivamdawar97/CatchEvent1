@@ -1,4 +1,4 @@
-package dawar.catchevent;
+package dawar.catchevent.EventClasses;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,9 +21,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Objects;
+
+import dawar.catchevent.CatchEvent;
 import dawar.catchevent.GalleryAndAlertClasses.GalleryActivity;
 import dawar.catchevent.GalleryAndAlertClasses.Image_slider;
 import dawar.catchevent.LogInClasses.LogInActivity;
+import dawar.catchevent.R;
+import dawar.catchevent.SettingsClasses.SettingsActivity;
 
 public class EventDetail extends AppCompatActivity {
 
@@ -95,35 +100,35 @@ public class EventDetail extends AppCompatActivity {
                     time.setText(" Timings :" + dataSnapshot.child("time").getValue().toString() +
                             "\n Venue:" + dataSnapshot.child("venue").getValue().toString());
                     time.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_place_black_24dp, 0, 0, 0);
-                    desc.setText(dataSnapshot.child("desc").getValue().toString());
+                    desc.setText(Objects.requireNonNull(dataSnapshot.child("desc").getValue()).toString());
                     String newtext;
                     if (dataSnapshot.hasChild("regfee")) {
-                        newtext = dataSnapshot.child("regfee").getValue().toString();
+                        newtext = Objects.requireNonNull(dataSnapshot.child("regfee").getValue()).toString();
                         regfee.setText(" Registration Fee : " + newtext);
                         regfee.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_attach_money_black_24dp, 0, 0, 0);
                     }
                     if (dataSnapshot.hasChild("fstpz")) {
-                        newtext = dataSnapshot.child("fstpz").getValue().toString();
+                        newtext = Objects.requireNonNull(dataSnapshot.child("fstpz").getValue()).toString();
                         regfee.append("\n First Prize : " + newtext);
                     }
                     if (dataSnapshot.hasChild("sndpz")) {
-                        newtext = dataSnapshot.child("sndpz").getValue().toString();
+                        newtext = Objects.requireNonNull(dataSnapshot.child("sndpz").getValue()).toString();
                         regfee.append("\n Second Prize : " + newtext);
                     }
                     if (dataSnapshot.hasChild("thrdpz")) {
-                        newtext = dataSnapshot.child("thrdpz").getValue().toString();
+                        newtext = Objects.requireNonNull(dataSnapshot.child("thrdpz").getValue()).toString();
                         regfee.append("\n Third Prize : " + newtext);
                     }
                     if(dataSnapshot.hasChild("rs_fst")){
-                        newtext =dataSnapshot.child("rs_fst").getValue().toString();
+                        newtext = Objects.requireNonNull(dataSnapshot.child("rs_fst").getValue()).toString();
                         fst.setText(newtext);
                     }
                     if(dataSnapshot.hasChild("rs_snd")){
-                        newtext =dataSnapshot.child("rs_snd").getValue().toString();
+                        newtext = Objects.requireNonNull(dataSnapshot.child("rs_snd").getValue()).toString();
                         snd.setText(newtext);
                     }
                     if(dataSnapshot.hasChild("rs_thd")){
-                        newtext =dataSnapshot.child("rs_thd").getValue().toString();
+                        newtext = Objects.requireNonNull(dataSnapshot.child("rs_thd").getValue()).toString();
                         thd.setText(newtext);
                     }
                 }
@@ -146,8 +151,7 @@ public class EventDetail extends AppCompatActivity {
         muser=mAuth.getCurrentUser();
         if(muser==null)
         {
-            MenuItem item=menu.findItem(R.id.action_logout);
-            item.setVisible(false);
+            MenuItem item;
             item=menu.findItem(R.id.action_settings);
             item.setVisible(false);
 
@@ -171,7 +175,7 @@ public class EventDetail extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            Intent i=new Intent(EventDetail.this,ListActivity.class);
+            Intent i=new Intent(EventDetail.this,SettingsActivity.class);
             i.putExtra("sett",-1);
             startActivity(i);
             return true;
@@ -181,24 +185,7 @@ public class EventDetail extends AppCompatActivity {
             startActivity(new Intent(EventDetail.this, LogInActivity.class));
             return true;
         }
-        if(id==R.id.action_logout){
 
-            if(muser!=null) {
-                mAuth.signOut();
-                synchronized (mAuth) {
-                    muser=null;
-                    mAuth.notify();
-                }
-                Snackbar.make(layout, "Logged Out Successfully", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-            }
-            else    {
-                Snackbar.make(layout, "You are not Logged In", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-
-            }
-            finish();
-            startActivity(getIntent());
-
-        }
         return super.onOptionsItemSelected(item);
     }
 

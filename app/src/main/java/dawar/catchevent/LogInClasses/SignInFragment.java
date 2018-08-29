@@ -4,9 +4,11 @@ package dawar.catchevent.LogInClasses;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,10 +39,10 @@ import dawar.catchevent.MainActivity;
 import dawar.catchevent.R;
 
 import static dawar.catchevent.CatchEvent.mdatabase;
-import static dawar.catchevent.CatchEvent.userType;
 import static dawar.catchevent.CatchEvent.mAuth;
 
 import static dawar.catchevent.LogInClasses.CommonAdapter.RC_SIGN_IN;
+
 import static dawar.catchevent.LogInClasses.CommonAdapter.mgoogleApiClient;
 
 
@@ -58,7 +60,6 @@ public class SignInFragment extends Fragment {
     View v;
     Button signIn;
     ProgressDialog progressDialog;
-
     SignInButton googlebtn;
     FragmentActivity activity;
     DatabaseReference mUSerData;
@@ -74,8 +75,9 @@ public class SignInFragment extends Fragment {
                 NeedAccListener());
         activity=getActivity();
         signIn=v.findViewById(R.id.button4);
-        editEmail=v.findViewById(R.id.editEmail);
+        editEmail=v.findViewById(R.id.editUsername);
         editPassword=v.findViewById(R.id.editPass);
+
         googlebtn=v.findViewById(R.id.googlebtn);
 
         googlebtn.setOnClickListener(new View.OnClickListener() {
@@ -101,24 +103,30 @@ public class SignInFragment extends Fragment {
 
     private static class NeedAccListener implements View.OnClickListener {
         @Override
-        public void onClick(View view) {
+        public void onClick(final View view) {
+            view.setBackgroundColor(view.getContext().getResources().getColor(R.color.select));
+            (new Handler()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    //Do something after 200ms
+                    LogInActivity.notifyPagesAdded(new BlankFragment(),new SignUpFragment());
+                    view.setBackgroundColor(0);
+                }
+            },200);
 
-            LogInActivity.notifyPagesAdded(new BlankFragment(),new SignUpFragment());
 
         }
     }
 
-    private void signInwithEmailandPass() {
+    private void signInwithEmailandPass( ) {
         String email,pass;
         email=editEmail.getText().toString().trim();
         pass=editPassword.getText().toString().trim();
-
-        if( !(TextUtils.isEmpty(email)) || (TextUtils.isEmpty(pass))){
+        email=email.concat("@catchevent.com");
+        if( !(TextUtils.isEmpty(email)) && !(TextUtils.isEmpty(pass))){
             progressDialog=new ProgressDialog(getActivity());
             progressDialog.setTitle("Signing in...");
             progressDialog.show();
-
-
 
             mAuth.signInWithEmailAndPassword(email, pass)
                     .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
@@ -127,9 +135,6 @@ public class SignInFragment extends Fragment {
                             if (task.isSuccessful()) {
                                 // Sign in success, update UI with the signed-in user's information
 
-                                FirebaseUser user = mAuth.getCurrentUser();
-
-                                updateUI(user);
                                 getActivity().finish();
                                 startActivity(new Intent(getActivity(), MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                             } else {
@@ -147,22 +152,7 @@ public class SignInFragment extends Fragment {
         }
     }
 
-    private void updateUI(final FirebaseUser user) {
 
-        final String id=user.getUid();
-
-        mdatabase.child("users").child(id).child("userType").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                userType=Integer.parseInt(dataSnapshot.getValue().toString());
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
 
     void firebaseAuthWithGoogle(GoogleSignInAccount account) {
         final FirebaseAuth mAuth=FirebaseAuth.getInstance();
@@ -196,8 +186,6 @@ public class SignInFragment extends Fragment {
                 if (!dataSnapshot.hasChild(id)) {
                     //Send user to Register Fragment
 
-                    Boolean b=dataSnapshot.hasChild(id);
-                    //Toast.makeText(activity,b.toString(),Toast.LENGTH_LONG).show();
                     mAuth.signOut();
                     user.delete();
                     if(LogInActivity.fragments.size()<3) {

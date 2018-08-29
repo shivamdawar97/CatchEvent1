@@ -1,4 +1,4 @@
-package dawar.catchevent;
+package dawar.catchevent.UdbhavClasses;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,6 +16,9 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import dawar.catchevent.EventClasses.EventDetail;
+import dawar.catchevent.R;
 
 public class UdbhavMainActivity extends AppCompatActivity {
 

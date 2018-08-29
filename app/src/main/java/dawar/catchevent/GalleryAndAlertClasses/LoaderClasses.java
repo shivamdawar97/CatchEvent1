@@ -340,11 +340,19 @@ public class LoaderClasses {
                         do {
 
                             AlertsAdapter.altKeys.add(cursor.getString(0));
+                            mdatabase.child("Alerts").child(cursor.getString(0)).getRef().keepSynced(true);
                             mdatabase.child("Alerts").child(cursor.getString(0)).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
-                                    AlertsAdapter.titles.add(Objects.requireNonNull(dataSnapshot.child("title").getValue()).toString());
-                                    AlertsAdapter.captns.add(Objects.requireNonNull(dataSnapshot.child("captn").getValue()).toString());
+                                    try {
+
+                                        AlertsAdapter.titles.add(Objects.requireNonNull(dataSnapshot.child("title").getValue()).toString());
+                                        AlertsAdapter.captns.add(Objects.requireNonNull(dataSnapshot.child("captn").getValue()).toString());
+
+                                    }
+                                    catch (NullPointerException e){
+                                        e.printStackTrace();
+                                    }
 
                                 }
 

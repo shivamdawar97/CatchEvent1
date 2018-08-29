@@ -1,4 +1,4 @@
-package dawar.catchevent;
+package dawar.catchevent.UdbhavClasses;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import java.util.HashMap;
 import java.util.List;
+
+import dawar.catchevent.R;
 
 /**
  * Created by shivam97 on 13/3/18.
