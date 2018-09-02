@@ -198,6 +198,7 @@ public class SignInFragment extends Fragment {
                 {
                     Toast.makeText(activity,"log in Successful",Toast.LENGTH_LONG).show();
                     activity.finish();
+                    startActivity(new Intent(activity,MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                 }
             }
             @Override

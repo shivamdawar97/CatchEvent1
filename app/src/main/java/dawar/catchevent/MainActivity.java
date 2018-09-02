@@ -22,7 +22,6 @@ import android.os.Bundle;
 
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -37,6 +36,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -50,6 +50,7 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -60,14 +61,18 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Objects;
 import java.util.UUID;
 import dawar.catchevent.GalleryAndAlertClasses.GalleryActivity;
 import dawar.catchevent.LogInClasses.LogInActivity;
 import dawar.catchevent.SettingsClasses.SettingsActivity;
 
 
+import static dawar.catchevent.CatchEvent.Uid;
+import static dawar.catchevent.CatchEvent.getUserType;
 import static dawar.catchevent.CatchEvent.mdatabase;
 import static dawar.catchevent.CatchEvent.sdatabase;
+import static dawar.catchevent.CatchEvent.userType;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener
@@ -265,7 +270,7 @@ public class MainActivity extends AppCompatActivity
                 Toast.makeText(MainActivity.this, "You are not Registered", Toast.LENGTH_SHORT).show();
 
             } else {
-
+                getUserType();
                 AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this);
                 ab.setTitle("Choose Image Source:");
                 ab.setPositiveButton("CAMERA", new DialogInterface.OnClickListener() {
@@ -364,12 +369,51 @@ public class MainActivity extends AppCompatActivity
 
         if((requestCode==9 || requestCode==8) && data!=null ){
 
-
+            final ArrayList<String> keys;
+            keys=new ArrayList<>();
             AlertDialog.Builder builderSingle = new AlertDialog.Builder(MainActivity.this);
             builderSingle.setTitle("Select One Name:-");
             final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.select_dialog_singlechoice);
 
-            arrayAdapter.addAll(titles);
+            //TODO: FOR SINGLE ORGANISER
+
+            if(userType==2) {
+                mdatabase.child("users").child(Uid).child("events").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            keys.add(snapshot.getKey());
+                            arrayAdapter.add(Objects.requireNonNull(snapshot.getValue()).toString());
+
+                        }
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+            }
+            else if(userType==3) {
+
+                mdatabase.child("Events").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for(DataSnapshot snapshot: dataSnapshot.getChildren()){
+                            keys.add(snapshot.getKey());
+                            arrayAdapter.add(snapshot.child("name").getValue().toString());
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+            }
+
+
+
 
             builderSingle.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
                 @Override
@@ -424,7 +468,7 @@ public class MainActivity extends AppCompatActivity
                                         newpost.child("date").setValue(s);
                                         newpost.child("captn").setValue(s3);
                                         s = newpost.getKey();
-                                        newpost = mdatabase.child("Events").child(Events.get(which)).child("Gallery").push();
+                                        newpost = mdatabase.child("Events").child(keys.get(which)).child("Gallery").push();
                                         newpost.setValue(s);
                                         Toast.makeText(MainActivity.this, "Image Uploaded Succesfully",
                                                 Toast.LENGTH_SHORT).show();

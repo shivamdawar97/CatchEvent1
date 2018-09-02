@@ -41,7 +41,7 @@ public class CatchEvent extends Application {
     public static StorageReference mstorage;
     public static FirebaseAuth mAuth;
     public static SQLiteDatabase sdatabase;
-    public static ArrayList<String> imgKeys,altKeys;
+    public static ArrayList<String> imgKeys;
     public static String Uid;
     public static int userType=1;
 
@@ -84,7 +84,7 @@ public class CatchEvent extends Application {
 
 
         imgKeys=new ArrayList<>();
-        altKeys=new ArrayList<>();
+
         mAuth.addAuthStateListener(new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {

@@ -220,7 +220,9 @@ public class AddAlerts extends AppCompatActivity {
                                 bitmaps.add(0,bitmap);
                                 cptn[0]=cptn[0]+"\n"+getTime()+
                                 "\n Event:"+getIntent().getStringExtra("name");
-                                captions.add(0,cptn[0]);
+                                cptn[0]=cptn[0].trim();
+                                captions.add(0,
+                                        cptn[0]);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }

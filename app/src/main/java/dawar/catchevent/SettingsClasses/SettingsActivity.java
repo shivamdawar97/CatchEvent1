@@ -42,7 +42,7 @@ public class SettingsActivity extends AppCompatActivity {
         mdatabase.child("users").child(Uid).child("userType").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                userType =Integer.parseInt(dataSnapshot.getValue().toString()) ;
+                userType =Integer.parseInt(dataSnapshot.getValue().toString());
                 viewPager=findViewById(R.id.content_view_setting);
                 viewPager.setScrollContainer(true);
                 adapter=new ViewPagerAdapter(getSupportFragmentManager());

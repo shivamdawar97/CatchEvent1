@@ -9,101 +9,98 @@
     tools:context="dawar.catchevent.EventClasses.EventDetail"
     tools:showIn="@layout/activity_event_detail">
 
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="match_parent"
-        android:onClick="enlargeIt"
-        android:layout_height="169dp"
-        android:background="#f2f2f2"
-        android:scaleType="centerCrop"
-        android:contentDescription="@string/event_image"
-        app:layout_constraintBottom_toTopOf="@+id/event_title"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/event_title"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textSize="26sp"
-        android:paddingStart="8dp"
-        android:textColor="#000"
-        android:gravity="center"
-        app:layout_constraintBottom_toTopOf="@+id/scrollView2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView2" />
 
     <ScrollView
         android:id="@+id/scrollView2"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/event_title">
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:scrollbarAlwaysDrawVerticalTrack="true">
 
-            <TextView
-                android:id="@+id/Summry"
+            <ImageView
+                android:id="@+id/imageView2"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:text="@string/summry"
-                android:paddingStart="4dp"
+                android:onClick="enlargeIt"
+                android:layout_height="169dp"
                 android:background="#f2f2f2"
-                android:textColor="@android:color/holo_red_light"
-                android:textSize="24sp"
-                 />
+                android:scaleType="centerCrop"
+                android:contentDescription="@string/event_image"
+                />
+
+            <TextView
+                android:id="@+id/event_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="28sp"
+                android:text="Name"
+                android:layout_marginTop="20dp"
+                android:textColor="@color/cardview_dark_background"
+                android:layout_marginStart="10dp"
+                android:textStyle="bold"
+                />
+
+            <TextView
+                android:id="@+id/RegistrationFee"
+                android:textSize="20sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="2dp"
+                android:text="fee" />
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="#333333"
+                android:layout_height="1dp"
+                android:background="#d9d9d9"
                 />
             <TextView
                 android:id="@+id/Date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#f2f2f2"
-                android:pointerIcon="arrow"
-                android:textAppearance="@style/Base.TextAppearance.AppCompat.Large" />
-
+                android:layout_marginStart="10dp"
+                android:textSize="20sp"
+                />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#d9d9d9"
+                />
             <TextView
                 android:id="@+id/Timings"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#f2f2f2"
-                android:pointerIcon="arrow"
-                android:textAppearance="@style/Base.TextAppearance.AppCompat.Large" />
+                android:textSize="20sp"
+                android:layout_marginStart="10dp"
 
-            <TextView
-                android:id="@+id/RegistrationFee"
+                />
+
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:pointerIcon="arrow"
-                android:background="#f2f2f2"
-                android:textAppearance="@style/Base.TextAppearance.AppCompat.Large" />
+                android:layout_height="1dp"
+                android:background="#333333"
+                />
 
             <TextView
                 android:id="@+id/desc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
+                android:layout_marginStart="10dp"
                 android:autoLink="all"
-                android:background="#f2f2f2"
                 android:textSize="20sp" />
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="#333333"
-                />
 
             <LinearLayout
                 android:layout_width="match_parent"

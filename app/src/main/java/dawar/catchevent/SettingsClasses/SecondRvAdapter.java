@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -52,12 +53,29 @@ public class SecondRvAdapter extends RecyclerView.Adapter<SecondRvAdapter.ViewHo
                 }
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
+
                 }
             });
         }
         else if(userType==3) {
-            mValues.addAll(Titles);
-            keys.addAll(CatchEvent.keys);
+
+            mdatabase.child("Events").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for(DataSnapshot snapshot: dataSnapshot.getChildren()){
+                        keys.add(snapshot.getKey());
+                        mValues.add(snapshot.child("name").getValue().toString());
+                        notifyDataSetChanged();
+                        tv.setVisibility(View.INVISIBLE);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
         }
 
     }

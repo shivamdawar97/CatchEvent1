@@ -1,7 +1,7 @@
 package dawar.catchevent.GalleryAndAlertClasses;
 
 import android.app.AlertDialog;
-import android.content.ContentValues;
+
 import android.support.v4.app.LoaderManager;
 import android.app.ProgressDialog;
 import android.support.v4.content.AsyncTaskLoader;
@@ -14,14 +14,14 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
+
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,13 +30,13 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -44,11 +44,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Objects;
 
+
 import static dawar.catchevent.CatchEvent.getCompressed;
 import static dawar.catchevent.CatchEvent.getTime;
+import static dawar.catchevent.CatchEvent.mAuth;
 import static dawar.catchevent.CatchEvent.mdatabase;
 import static dawar.catchevent.CatchEvent.mstorage;
 import static dawar.catchevent.CatchEvent.sdatabase;
+import static dawar.catchevent.CatchEvent.imgKeys;
 
 import dawar.catchevent.CatchEvent;
 import dawar.catchevent.SettingsClasses.SettingsActivity;
@@ -66,9 +69,7 @@ public class GalleryActivity extends AppCompatActivity implements LoaderManager.
     ProgressDialog mDialog;
     LoaderClasses loaders;
     private Bitmap compress;
-    private FirebaseUser muser;
-    private FirebaseAuth mAuth;
-    private FloatingTextButton ftb;
+
     int i=0;
     int viewType;
 
@@ -81,7 +82,7 @@ public class GalleryActivity extends AppCompatActivity implements LoaderManager.
         setSupportActionBar(toolbar);
 
         Objects.requireNonNull(getSupportActionBar()).setTitle(getIntent().getStringExtra("name"));
-        ftb= findViewById(R.id.ftb);
+        FloatingTextButton ftb = findViewById(R.id.ftb);
 
         viewType= getIntent().getIntExtra("view",1);
 
@@ -125,36 +126,35 @@ public class GalleryActivity extends AppCompatActivity implements LoaderManager.
 
             getSupportLoaderManager().initLoader(i, b, loaders.new GalleryCallbacks()).forceLoad();
             i++;
+
+            getSupportLoaderManager().initLoader(i,null,this).forceLoad();
+            i++;
         }
         else
             {
+
                 ftb.setVisibility(View.INVISIBLE);
                 getSupportActionBar().setTitle("Alerts");
                 AlertsAdapter adapter=new AlertsAdapter(this);
                 imagerecycler.setAdapter(adapter);
                 imagerecycler.setLayoutManager(new LinearLayoutManager(this));
-                loaders=new LoaderClasses(this,adapter);
 
-            if (viewType == 5) {
-
+          // if want to impliment loaders for alerts
+            /*               loaders=new LoaderClasses(this,adapter);
+           if (viewType == 5) {
                 Log.i("LogMessage","selected event alerts");
                 b.putInt("type", GalleryProvider.EVENT_ALERTS);
                 b.putString("eventKey", keyID);
-
             } else {
-
                 Log.i("LogMessage","selected all alerts");
                 ftb.setVisibility(View.INVISIBLE);
                 b.putInt("type", GalleryProvider.ALL_ALERTS);
             }
-
             getSupportLoaderManager().initLoader(i, b, loaders.new GalleryCallbacks()).forceLoad();
-            i++;
+            i++;*/
+
+            initiateFirebaseForAlerts(adapter);
         }
-
-        getSupportLoaderManager().initLoader(i,null,this).forceLoad();
-        i++;
-
     }
 
 
@@ -199,6 +199,7 @@ public class GalleryActivity extends AppCompatActivity implements LoaderManager.
                                     @SuppressWarnings("VisibleForTests") final Uri dnldurl=taskSnapshot.getDownloadUrl();
                                     DatabaseReference newpost=mdatabase.child("Gallery").push();
                                     cptn[0]=cptn[0]+"\n"+getTime()+"\n Event:"+getIntent().getStringExtra("name");
+                                    cptn[0]=cptn[0].trim();
                                     newpost.child("url").setValue(Objects.requireNonNull(dnldurl).toString());
                                     newpost.child("eventKey").setValue(keyID);
                                     newpost.child("captn").setValue(cptn[0]);
@@ -233,10 +234,8 @@ public class GalleryActivity extends AppCompatActivity implements LoaderManager.
     @Override
     public void onLoadFinished(@NonNull Loader loader, Object o) {
 
-        if(viewType<3)
-            initiateFirebaseForGallery();
-        else
-            initiateFirebaseForAlerts();
+        initiateFirebaseForGallery();
+
 
     }
 
@@ -257,20 +256,17 @@ public class GalleryActivity extends AppCompatActivity implements LoaderManager.
         @Override
         public Object loadInBackground() {
 
-           if(vType<3)
-            cursor = sdatabase.query("Gallery", new String[]{"imgKey"}, null,
-                    null, null, null, null);
-           else
-               cursor = sdatabase.query("Alerts", new String[]{"altKey"}, null,
+
+               cursor = sdatabase.query("Gallery", new String[]{"imgKey"}, null,
                        null, null, null, null);
 
+           /* else
+               cursor = sdatabase.query("Alerts", new String[]{"altKey"}, null,
+                       null, null, null, null);
+          */
             if (cursor.moveToFirst()) {
                 do {
-                        if(vType<3)
-                    CatchEvent.imgKeys.add(cursor.getString(0));
-                        else
-                    CatchEvent.altKeys.add(cursor.getString(0));
-
+                    imgKeys.add(cursor.getString(0));
                 } while (cursor.moveToNext());
 
             }
@@ -282,9 +278,9 @@ public class GalleryActivity extends AppCompatActivity implements LoaderManager.
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
-        mAuth=FirebaseAuth.getInstance();
-        muser=mAuth.getCurrentUser();
-        if(muser==null)
+
+        FirebaseUser muser = mAuth.getCurrentUser();
+        if(muser ==null)
         {
             MenuItem item;
             item=menu.findItem(R.id.action_settings);
@@ -333,7 +329,7 @@ public class GalleryActivity extends AppCompatActivity implements LoaderManager.
 
                 try {
                     s=dataSnapshot.getKey();
-                    if(!CatchEvent.imgKeys.contains(s))
+                    if(!imgKeys.contains(s))
 
                     {
                         Bundle bundle = new Bundle();
@@ -361,8 +357,15 @@ public class GalleryActivity extends AppCompatActivity implements LoaderManager.
             }
 
             @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
+            public void onChildRemoved(DataSnapshot dataSnapshot)
+            {
+                String s=dataSnapshot.getKey();
+                if(imgKeys.contains(s)){
+                    sdatabase.delete("Gallery","imgKey=?",new String[]{s});
+                    imgKeys.remove(s);
+                    loaders.adapter.notifyDataSetChanged();
 
+                }
             }
 
             @Override
@@ -377,59 +380,28 @@ public class GalleryActivity extends AppCompatActivity implements LoaderManager.
         });
     }
 
-    private void initiateFirebaseForAlerts()
+    private void initiateFirebaseForAlerts(final AlertsAdapter adapter)
 
     {
-        mdatabase.child("Alerts").addChildEventListener(new ChildEventListener() {
+        if(viewType==5)
+        {
+            DatabaseReference reference=mdatabase.child("Events").child(keyID).child("Alerts");
+            reference.keepSynced(true);
+            reference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                public void onDataChange(DataSnapshot dataSnapshot) {
                     try {
-                        s=dataSnapshot.getKey();
-                        if(!CatchEvent.altKeys.contains(s)){
+                        for(DataSnapshot snapshot: dataSnapshot.getChildren()){
+                           String s= snapshot.getKey();
+                          if(!adapter.altKeys.contains(s)){
+                              adapter.updateAltKeys(s);
 
-                            ContentValues cv=new ContentValues();
-                            cv.put("altKey",s);
-                            AlertsAdapter.altKeys.add(s);
-
-                            /*
-                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                            DataOutputStream out = new DataOutputStream(baos);
-
-                            for(DataSnapshot s1: dataSnapshot.child("Images").getChildren()){
-
-                                out.writeUTF(Objects.requireNonNull(s1.getValue()).toString());
-                            }
-
-                            byte[] bytes = baos.toByteArray();
-                            cv.put("imgKeys",bytes);
-                            */
-
-                            s= Objects.requireNonNull(dataSnapshot.child("eventkey").getValue()).toString();
-                            cv.put("eventKey",s);
-
-                            sdatabase.insert("Alerts",null,cv);
+                          }
                         }
-
                     }
-                    catch (NullPointerException p){
-                        p.printStackTrace();
-                    }
-
-                }
-
-                @Override
-                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                }
-
-                @Override
-                public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                }
-
-                @Override
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
+            catch (NullPointerException e){
+                        e.printStackTrace();
+            }
                 }
 
                 @Override
@@ -437,6 +409,11 @@ public class GalleryActivity extends AppCompatActivity implements LoaderManager.
 
                 }
             });
+
+        }
+        else
+            adapter.updateAltKeys();
+
 
     }
 

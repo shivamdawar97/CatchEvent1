@@ -4,35 +4,24 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
+
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.content.Context;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
-
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 
-import static dawar.catchevent.CatchEvent.mdatabase;
 import static dawar.catchevent.CatchEvent.sdatabase;
 import static dawar.catchevent.GalleryAndAlertClasses.GalleryProvider.ALL_ALERTS;
 import static dawar.catchevent.GalleryAndAlertClasses.GalleryProvider.ALL_IMAGES;
@@ -42,23 +31,26 @@ import static dawar.catchevent.GalleryAndAlertClasses.GalleryProvider.EVENT_IMAG
 public class LoaderClasses {
 
     private Context ctx;
-    private ImagesAdapter adapter;
-    private AlertsAdapter alertsAdapter;
+     ImagesAdapter adapter;
+   // private AlertsAdapter alertsAdapter;
     private static ContentResolver contentResolver;
 
      LoaderClasses(Context ctx,ImagesAdapter adapter) {
         this.ctx = ctx;
         this.adapter=adapter;
-        alertsAdapter=null;
+      //  alertsAdapter=null;
         contentResolver=ctx.getContentResolver();
     }
 
-    LoaderClasses(Context ctx,AlertsAdapter adapter) {
+
+
+   /* LoaderClasses(Context ctx,AlertsAdapter adapter) {
         this.ctx = ctx;
         alertsAdapter=adapter;
         this.adapter=null;
         contentResolver=ctx.getContentResolver();
     }
+*/
 
     class FirebaseImageCallbacks implements LoaderManager.LoaderCallbacks {
 
@@ -137,6 +129,8 @@ public class LoaderClasses {
 
     }
 
+/*
+
     class FirebaseAlertCallbacks implements LoaderManager.LoaderCallbacks{
         @NonNull
         @Override
@@ -171,8 +165,8 @@ public class LoaderClasses {
         @Override
         public Object loadInBackground() {
 
-            /*
-            Getting elements for arrayList for byte[]
+
+            //Getting elements for arrayList for byte[]
             ByteArrayInputStream bais = new ByteArrayInputStream(imgKeys);
             DataInputStream in = new DataInputStream(bais);
             try {
@@ -183,12 +177,13 @@ public class LoaderClasses {
             catch (IOException e){
                 e.printStackTrace();
             }
-            */
+
 
 
             return null;
         }
     }
+*/
 
    public class GalleryCallbacks implements LoaderManager.LoaderCallbacks<HashMap<String,Bitmap>> {
 
@@ -249,8 +244,7 @@ public class LoaderClasses {
                 for(String s: data.keySet()){
                     adapter.updateDate(s,data.get(s));
                 }
-                else
-                    alertsAdapter.notifyDataSetChanged();
+
         }
 
         @Override
@@ -331,7 +325,9 @@ public class LoaderClasses {
                     Objects.requireNonNull(cursor).close();
                     return hashMap;
 
-                case ALL_ALERTS:
+                    //if want to save alerts to sqlite but many more
+                    // database types have been intoduced(like room database)
+               /* case ALL_ALERTS:
                 case EVENT_ALERTS:
 
                     cursor=sdatabase.query("Alerts",projection,selection,selectionArgs,null,null,null);
@@ -364,7 +360,7 @@ public class LoaderClasses {
                         }while (cursor.moveToNext());
                     }
                     Objects.requireNonNull(cursor).close();
-                    return null;
+                    return null;*/
             }
 
             return null;

@@ -16,6 +16,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import dawar.catchevent.EventClasses.AddEvent;
+import dawar.catchevent.LogInClasses.LogInActivity;
+import dawar.catchevent.MainActivity;
 import dawar.catchevent.R;
 
 import static dawar.catchevent.CatchEvent.mAuth;
@@ -59,9 +61,12 @@ public class SettingListAdapter extends BaseAdapter {
                         ctx.startActivity(new Intent(ctx, AddEvent.class));
                         break;
                     case "LogOut":
+
                         mAuth.signOut();
                        Toast.makeText(view.getContext(),"Logged Out Successfully",Toast.LENGTH_LONG).show();
                         ((SettingsActivity) view.getContext()).finish();
+                        ( view.getContext()).startActivity(new Intent(view.getContext(), LogInActivity.class)
+                                .setFlags( Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_NEW_TASK));
                         break;
 
                     default:

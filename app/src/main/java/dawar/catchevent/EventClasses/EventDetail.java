@@ -104,20 +104,19 @@ public class EventDetail extends AppCompatActivity {
                     String newtext;
                     if (dataSnapshot.hasChild("regfee")) {
                         newtext = Objects.requireNonNull(dataSnapshot.child("regfee").getValue()).toString();
-                        regfee.setText(" Registration Fee : " + newtext);
-                        regfee.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_attach_money_black_24dp, 0, 0, 0);
+                        regfee.setText("₹"+newtext);
                     }
                     if (dataSnapshot.hasChild("fstpz")) {
                         newtext = Objects.requireNonNull(dataSnapshot.child("fstpz").getValue()).toString();
-                        regfee.append("\n First Prize : " + newtext);
+                        regfee.append("\n First:" + newtext);
                     }
                     if (dataSnapshot.hasChild("sndpz")) {
                         newtext = Objects.requireNonNull(dataSnapshot.child("sndpz").getValue()).toString();
-                        regfee.append("\n Second Prize : " + newtext);
+                        regfee.append("\n Second: " + newtext);
                     }
                     if (dataSnapshot.hasChild("thrdpz")) {
                         newtext = Objects.requireNonNull(dataSnapshot.child("thrdpz").getValue()).toString();
-                        regfee.append("\n Third Prize : " + newtext);
+                        regfee.append("\n Third: " + newtext);
                     }
                     if(dataSnapshot.hasChild("rs_fst")){
                         newtext = Objects.requireNonNull(dataSnapshot.child("rs_fst").getValue()).toString();
@@ -182,7 +181,9 @@ public class EventDetail extends AppCompatActivity {
         }
 
         if(id == R.id.action_login){
-            startActivity(new Intent(EventDetail.this, LogInActivity.class));
+
+            //startActivity(new Intent(EventDetail.this, LogInActivity.class));
+            startActivity(new Intent(EventDetail.this,EventDetail2.class));
             return true;
         }
 

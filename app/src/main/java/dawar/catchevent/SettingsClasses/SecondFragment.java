@@ -126,8 +126,11 @@ public class SecondFragment extends Fragment {
     private void deleteAlert(final String ekey) {
         final List<String> keys=new ArrayList<>();
 
-        android.app.AlertDialog.Builder builderSingle = new android.app.AlertDialog.Builder(getActivity());
+        final android.app.AlertDialog.Builder builderSingle = new android.app.AlertDialog.Builder(getActivity());
         builderSingle.setTitle("Select One :-");
+        final TextView tv=new TextView(getActivity());
+        tv.setText("   ~No Alerts Here");
+        builderSingle.setView(tv);
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.select_dialog_singlechoice);
         mdatabase.child("Events").child(ekey).child("Alerts").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -136,6 +139,7 @@ public class SecondFragment extends Fragment {
                 for(DataSnapshot snapshot: dataSnapshot.getChildren()){
                     keys.add(snapshot.getKey());
                     arrayAdapter.add(snapshot.getValue().toString());
+                    tv.setVisibility(View.INVISIBLE);
                 }
             }
 
@@ -144,6 +148,7 @@ public class SecondFragment extends Fragment {
 
             }
         });
+
         builderSingle.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -194,11 +199,13 @@ public class SecondFragment extends Fragment {
                         @Override
                         public void onSuccess(Void aVoid) {
                             mdatabase.child("Gallery").child(s2).getRef().removeValue();
-                            mdatabase.child("Events").child(ekey).child(s2).getRef().removeValue();
+                            mdatabase.child("Events").child(ekey).child("Gallery").child(s2).getRef().removeValue();
+
                         }
                     });
                 }
                 mdatabase.child("Alerts").child(key).getRef().removeValue();
+                mdatabase.child("Events").child(ekey).child("Alerts").child(key).getRef().removeValue();
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -226,6 +233,7 @@ public class SecondFragment extends Fragment {
                 pd.show();
 
                 DatabaseReference mdelete=mdatabase.child("Events").child(key);
+
                 mdelete.child("image").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -279,6 +287,7 @@ public class SecondFragment extends Fragment {
                 pd.dismiss();
                 Toast.makeText(context,"Event Deleted",Toast.LENGTH_SHORT).show();
                 ((SettingsActivity)context).finish();
+
             }
 
         });

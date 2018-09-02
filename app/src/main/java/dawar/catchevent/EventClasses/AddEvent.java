@@ -13,11 +13,15 @@ import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -46,12 +50,15 @@ import static dawar.catchevent.CatchEvent.mstorage;
 public class AddEvent extends AppCompatActivity {
     ImageButton imageView;
     EditText ed1,ed2,ed3,ed4,ed5,ed6,ed7,ed8,ed9;
+    CheckBox cBox;
     private Uri filepath;
     public static final int PICK=234;
     Bitmap bitmap;
+    LinearLayout linearLayout;
   //  private String U1,U2;
   //  int cl,ch;//is cl for parent event (Udbhav/Spardha) and ch-->is for whether it is a special event or not
     private ProgressDialog pd;
+    private int t=0;
 
     @SuppressLint("ClickableViewAccessibility")
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -62,7 +69,10 @@ public class AddEvent extends AppCompatActivity {
         Toolbar toolbar =  findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        linearLayout=findViewById(R.id.prize_linear);
+        linearLayout.setVisibility(View.GONE);
         imageView=findViewById(R.id.add_event_image);
+        cBox=findViewById(R.id.check_box);
        // View view=getLayoutInflater().inflate(R.layout.content_add_event,null);
         pd= new ProgressDialog(this);
         ed1=findViewById(R.id.edit_ename);
@@ -90,6 +100,21 @@ public class AddEvent extends AppCompatActivity {
                 return false;
             }
         });
+
+        cBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if(b){
+            linearLayout.setVisibility(View.VISIBLE);
+            t=1;
+                }
+                else {
+                    t=0;
+                    linearLayout.setVisibility(View.GONE);
+                }
+            }
+        });
+
     }
 
 
@@ -121,17 +146,18 @@ public class AddEvent extends AppCompatActivity {
     }
 
     public void createEvent(View view) {
-        final String s1=ed1.getText().toString();
-        final String s2=ed2.getText().toString();
-        final String s3=ed3.getText().toString();
-        final String s4=ed4.getText().toString();
+        final String s1=ed1.getText().toString().trim();
+        final String s2=ed2.getText().toString().trim();
+        final String s3=ed3.getText().toString().trim();
+        final String s4=ed4.getText().toString().trim();
         final String s5=ed5.getText().toString().trim();
         final String s6=ed6.getText().toString().trim();
         final String s7=ed7.getText().toString().trim();
         final String s8=ed8.getText().toString().trim();
-        final String s9=ed9.getText().toString();
+        final String s9=ed9.getText().toString().trim();
 
-        if(filepath != null && s2 != null && s3 != null && s4 != null && s9 != null)
+        if(filepath != null && !TextUtils.isEmpty(s2) && !TextUtils.isEmpty(s3) &&
+                !TextUtils.isEmpty(s4) && !TextUtils.isEmpty(s5) && !TextUtils.isEmpty(s9))
         {
             StorageReference riversRef = mstorage.child("images").child(s1).child(filepath.getLastPathSegment());
             pd.setTitle("Updating The Event Details...");
@@ -153,18 +179,19 @@ public class AddEvent extends AppCompatActivity {
                     newPost.child("time").setValue(s3);
                     newPost.child("desc").setValue(s4);
                     newPost.child("venue").setValue(s9);
+                    newPost.child("regfee").setValue(s5);
 
-
-                    if(!s5.equals("")){
-                        newPost.child("regfee").setValue(s5);
-                    }if(!s6.equals("")){
-                        newPost.child("fstpz").setValue(s6);
-                    } if(!s7.equals("")){
-                        newPost.child("sndpz").setValue(s7);
-                    } if(!s8.equals("")){
-                        newPost.child("thrdpz").setValue(s8);
+                    if(t==1) {
+                        if (!s6.equals("")) {
+                            newPost.child("fstpz").setValue(s6);
+                        }
+                        if (!s7.equals("")) {
+                            newPost.child("sndpz").setValue(s7);
+                        }
+                        if (!s8.equals("")) {
+                            newPost.child("thrdpz").setValue(s8);
+                        }
                     }
-
 
                     mdatabase.child("users").child(Uid).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override

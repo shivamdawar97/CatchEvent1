@@ -30,9 +30,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(SQL_CREATE_TABLE);
 
         //create alerts table for event
-        SQL_CREATE_TABLE= "Create table Alerts"+
+
+       /* SQL_CREATE_TABLE= "Create table Alerts"+
                 "(altKey TEXT PRIMARY KEY,imgkeys blob, eventKey TEXT);";
-        sqLiteDatabase.execSQL(SQL_CREATE_TABLE);
+        sqLiteDatabase.execSQL(SQL_CREATE_TABLE);*/
     }
 
     @Override

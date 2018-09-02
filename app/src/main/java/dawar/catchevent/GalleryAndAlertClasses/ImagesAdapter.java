@@ -90,13 +90,4 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ImagesView
          }
     }
 
-     class CursorBackground extends AsyncTask<Cursor,Void,Void> {
-
-        @Override
-        protected Void doInBackground(Cursor... cursors) {
-            Cursor cursor=cursors[0];
-
-            return null;
-        }
-    }
 }

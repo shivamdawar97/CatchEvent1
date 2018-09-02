@@ -45,7 +45,6 @@ public class AlertDetails extends AppCompatActivity {
         setContentView(R.layout.activity_alert_details);
         t1=findViewById(R.id.al_ttl_view);
         t2=findViewById(R.id.al_dsc_view);
-
         t4=findViewById(R.id.al_date_);
         al_rv=findViewById(R.id.al_rec_view);
         images=new ArrayList<>();
@@ -54,7 +53,7 @@ public class AlertDetails extends AppCompatActivity {
         title=getIntent().getStringExtra("title");
         t1.setText(title);
         t4.setText(getIntent().getStringExtra("captn"));
-
+        mdatabase.child("Alerts").child(key).keepSynced(true);
         mdatabase.child("Alerts").child(key).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

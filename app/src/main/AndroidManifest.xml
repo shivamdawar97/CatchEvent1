@@ -19,11 +19,7 @@
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".EventClasses.AddEvent"
@@ -40,7 +36,14 @@
         <activity android:name=".GalleryAndAlertClasses.AlertDetails" />
         <activity
             android:name=".Splash"
-            android:label="@string/app_name" />
+            android:label="@string/app_name"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".AboutUs"
             android:label="@string/title_activity_about_us" />
@@ -52,7 +55,10 @@
             android:authorities="dawar.catchevent.GalleryAndAlertClasses"
             android:exported="false" />
 
-        <activity android:name=".EventClasses.UpdateEvent"></activity>
+        <activity android:name=".EventClasses.UpdateEvent" />
+        <activity
+            android:name=".EventClasses.EventDetail2"
+            android:label="@string/title_activity_event_detail2"></activity>
     </application>
 
 </manifest>

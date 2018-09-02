@@ -32,4 +32,11 @@
     <string name="back"><u>Back</u></string>
     <string name="next">next</string>
     <string name="event">event</string>
+    <string name="title_activity_event_detail2">EventDetail2</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_details">Details</string>
+    <string name="title_qna">QNA</string>
+    <string name="result_event">This will be a competetive event and result will be declared</string>
 </resources>

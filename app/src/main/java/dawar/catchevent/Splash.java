@@ -3,12 +3,9 @@ package dawar.catchevent;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.View;
+import dawar.catchevent.LogInClasses.LogInActivity;
+import static dawar.catchevent.CatchEvent.mAuth;
 
 public class Splash extends AppCompatActivity {
 
@@ -16,8 +13,12 @@ public class Splash extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-         final int SPLASH_DISPLAY_LENGTH = 1000;
-
+         final int SPLASH_DISPLAY_LENGTH = 500;
+         final Class c;
+         if(mAuth.getCurrentUser()==null)
+             c= LogInActivity.class;
+         else
+             c=MainActivity.class;
         /** Called when the activity is first created. */
 
         /* New Handler to start the Menu-Activity
@@ -27,7 +28,7 @@ public class Splash extends AppCompatActivity {
                 public void run() {
 
                 /* Create an Intent that will start the Menu-Activity. */
-                    Intent mainIntent = new Intent(Splash.this,MainActivity.class);
+                    Intent mainIntent = new Intent(Splash.this,c);
                     Splash.this.startActivity(mainIntent);
                     Splash.this.finish();
                 }

@@ -292,12 +292,13 @@ public class SignUpFragment extends Fragment {
                             if(dataSnapshot.hasChild(Objects.requireNonNull(user).getUid())){
                                 mAuth.signOut();
                                 Toast.makeText(activity,"user already exists",Toast.LENGTH_SHORT).show();
-                                activity.finish();
                             }
                             else{
                                  Toast.makeText(activity,"Login successfully",Toast.LENGTH_SHORT).show();
                                 updateDatabase(Objects.requireNonNull(user),card);
                                 activity.finish();
+                                startActivity(new Intent(getActivity(), MainActivity.class)
+                                        .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                             }
 
                         }
