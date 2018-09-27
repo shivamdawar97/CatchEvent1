@@ -22,6 +22,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
     private  ArrayList<Bitmap> imgs;
     private Context ctx;
 
+
+
     RecyclerAdapter(Context c,ArrayList<String> titles,ArrayList<Bitmap> imgs,ArrayList<String> keys)
     {
      ctx=c;
@@ -68,10 +70,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
             return 0;
     }
 
-    public static class RecyclerViewHolder extends RecyclerView.ViewHolder {
+     static class RecyclerViewHolder extends RecyclerView.ViewHolder {
         View mview;
 
-        public RecyclerViewHolder(View itemView) {
+        RecyclerViewHolder(View itemView) {
             super(itemView);
             mview = itemView;
         }
@@ -80,6 +82,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
             ImageView imageView=mview.findViewById(R.id.event_image);
             title.setText(s1);
             imageView.setImageBitmap(s2);
+
+
         }
     }
+
+
 }

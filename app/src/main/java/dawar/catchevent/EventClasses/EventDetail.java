@@ -2,7 +2,6 @@ package dawar.catchevent.EventClasses;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -11,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,7 +26,6 @@ import java.util.Objects;
 import dawar.catchevent.CatchEvent;
 import dawar.catchevent.GalleryAndAlertClasses.GalleryActivity;
 import dawar.catchevent.GalleryAndAlertClasses.Image_slider;
-import dawar.catchevent.LogInClasses.LogInActivity;
 import dawar.catchevent.R;
 import dawar.catchevent.SettingsClasses.SettingsActivity;
 
@@ -38,9 +37,10 @@ public class EventDetail extends AppCompatActivity {
     FirebaseAuth mAuth;
     FirebaseUser muser;
     EditText fst,snd,thd;
-
+    LinearLayout resultsLayout;
     int  position;
-    TextView title,regfee,date,time,desc;
+    TextView title,regfee,date,time,
+             desc,venue,prizeView;
     View layout;
     String s;
     Button b;
@@ -52,6 +52,8 @@ public class EventDetail extends AppCompatActivity {
         Toolbar toolbar =  findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         layout=findViewById(R.id.detailcontent);
+        resultsLayout=findViewById(R.id.results_layout);
+        resultsLayout.setVisibility(View.GONE);
         im=findViewById(R.id.imageView2);
         mAuth=FirebaseAuth.getInstance();
         muser=mAuth.getCurrentUser();
@@ -64,7 +66,10 @@ public class EventDetail extends AppCompatActivity {
         b=findViewById(R.id.rs_bttn);
         time=findViewById(R.id.Timings);
         desc=findViewById(R.id.desc);
+        venue=findViewById(R.id.event_venue);
         mdata= FirebaseDatabase.getInstance().getReference();
+        prizeView=findViewById(R.id.prize_view);
+        prizeView.setVisibility(View.GONE);
 
         keyID=getIntent().getStringExtra("key");
         position=getIntent().getIntExtra("pos",0);
@@ -97,39 +102,42 @@ public class EventDetail extends AppCompatActivity {
 
                     date.setText(" DATE :" + dataSnapshot.child("date").getValue());
                     date.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_date_range_black_24dp, 0, 0, 0);
-                    time.setText(" Timings :" + dataSnapshot.child("time").getValue().toString() +
-                            "\n Venue:" + dataSnapshot.child("venue").getValue().toString());
-                    time.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_place_black_24dp, 0, 0, 0);
+                    time.setText(" Timings :" + dataSnapshot.child("time").getValue().toString());
+                   // time.setCompoundDrawablesWithIntrinsicBounds(R.drawable.iconwatch, 0, 0, 0);
+                    venue.setText("Venue:" + dataSnapshot.child("venue").getValue().toString());
+                    venue.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_place_black_24dp, 0, 0, 0);
                     desc.setText(Objects.requireNonNull(dataSnapshot.child("desc").getValue()).toString());
                     String newtext;
-                    if (dataSnapshot.hasChild("regfee")) {
+
                         newtext = Objects.requireNonNull(dataSnapshot.child("regfee").getValue()).toString();
-                        regfee.setText("₹"+newtext);
-                    }
+                        regfee.setText("₹ "+newtext);
+
                     if (dataSnapshot.hasChild("fstpz")) {
+                        prizeView.setVisibility(View.VISIBLE);
+                        prizeView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.icon_medal,0,0,0);
                         newtext = Objects.requireNonNull(dataSnapshot.child("fstpz").getValue()).toString();
-                        regfee.append("\n First:" + newtext);
+                        prizeView.setText(" First:" + newtext);
                     }
                     if (dataSnapshot.hasChild("sndpz")) {
                         newtext = Objects.requireNonNull(dataSnapshot.child("sndpz").getValue()).toString();
-                        regfee.append("\n Second: " + newtext);
+                        prizeView.append("\n Second: " + newtext);
                     }
                     if (dataSnapshot.hasChild("thrdpz")) {
                         newtext = Objects.requireNonNull(dataSnapshot.child("thrdpz").getValue()).toString();
-                        regfee.append("\n Third: " + newtext);
+                        prizeView.append("\n Third: " + newtext);
                     }
+
                     if(dataSnapshot.hasChild("rs_fst")){
+
+                        resultsLayout.setVisibility(View.VISIBLE);
                         newtext = Objects.requireNonNull(dataSnapshot.child("rs_fst").getValue()).toString();
                         fst.setText(newtext);
-                    }
-                    if(dataSnapshot.hasChild("rs_snd")){
                         newtext = Objects.requireNonNull(dataSnapshot.child("rs_snd").getValue()).toString();
                         snd.setText(newtext);
-                    }
-                    if(dataSnapshot.hasChild("rs_thd")){
                         newtext = Objects.requireNonNull(dataSnapshot.child("rs_thd").getValue()).toString();
                         thd.setText(newtext);
                     }
+
                 }
                 catch (NullPointerException e){
                     finish();
@@ -193,8 +201,10 @@ public class EventDetail extends AppCompatActivity {
 
     public void showGallery(View view) {
         Intent i=new Intent(EventDetail.this,GalleryActivity.class);
-            if(view.getId()==R.id.gal_btn)
-                i.putExtra("view",2);
+            if(view.getId()==R.id.gal_btn) {
+                i.putExtra("view", 2);
+                i.putExtra("name",s);
+            }
 
             else
                 i.putExtra("view", 5);

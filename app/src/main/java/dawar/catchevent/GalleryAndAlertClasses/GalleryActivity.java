@@ -196,7 +196,7 @@ public class GalleryActivity extends AppCompatActivity implements LoaderManager.
                             riversRef.putBytes(data1).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                 @Override
                                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                    @SuppressWarnings("VisibleForTests") final Uri dnldurl=taskSnapshot.getDownloadUrl();
+                                    @SuppressWarnings("VisibleForTests") final Uri dnldurl=taskSnapshot.getUploadSessionUri();
                                     DatabaseReference newpost=mdatabase.child("Gallery").push();
                                     cptn[0]=cptn[0]+"\n"+getTime()+"\n Event:"+getIntent().getStringExtra("name");
                                     cptn[0]=cptn[0].trim();

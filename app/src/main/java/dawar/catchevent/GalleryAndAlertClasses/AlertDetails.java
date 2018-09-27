@@ -184,16 +184,18 @@ public class AlertDetails extends AppCompatActivity {
                  im=itemView.findViewById(R.id.gallery_img);
             }
             protected void setImage(final String image){
-                Picasso.with(AlertDetails.this).load(image).networkPolicy(NetworkPolicy.OFFLINE).into(im, new Callback() {
+                Picasso.get().load(image).networkPolicy(NetworkPolicy.OFFLINE).into(im, new Callback() {
                     @Override
                     public void onSuccess() {
 
                     }
 
                     @Override
-                    public void onError() {
-                        Picasso.with(AlertDetails.this).load(image).into(im);
+                    public void onError(Exception e) {
+                        Picasso.get().load(image).into(im);
+
                     }
+
                 });
             }
         }

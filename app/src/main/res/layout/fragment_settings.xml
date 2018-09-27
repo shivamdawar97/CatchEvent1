@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".SettingsClasses.SettingsFrag">
 
     <!-- TODO: Update blank fragment layout -->
@@ -53,25 +53,26 @@
                     android:layout_height="wrap_content"
 
                     android:paddingStart="20dp"
-                    android:textColor="#000"
                     android:paddingTop="30dp"
                     android:text="name"
+                    android:textColor="#000"
                     android:textSize="26sp" />
+
                 <TextView
                     android:id="@+id/username_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingStart="20dp"
-                    android:text="username"/>
+                    android:text="username" />
 
                 <TextView
                     android:id="@+id/user_type_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="#000"
                     android:paddingStart="20dp"
                     android:paddingTop="30dp"
                     android:text="userType"
+                    android:textColor="#000"
                     android:textSize="16sp" />
 
             </LinearLayout>
@@ -83,13 +84,15 @@
     <ListView
         android:id="@+id/list_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbarSize="@dimen/fab_margin"
+        android:layout_height="0dp"
         android:layout_marginTop="10dp"
+        android:layout_weight="1"
+        android:requiresFadingEdge="vertical"
+        android:scrollbars="vertical"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardView2" />
-
+        app:layout_constraintTop_toBottomOf="@id/cardView2"
+        app:layout_constraintBottom_toBottomOf="parent"
+         />
 
 </android.support.constraint.ConstraintLayout>

@@ -51,6 +51,10 @@
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
             android:textSize="22sp" />
 
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp">
         <EditText
             android:id="@+id/editText2"
             android:layout_width="match_parent"
@@ -61,27 +65,39 @@
             android:ems="10"
             android:hint="Enter Full Name"
             android:inputType="textPersonName" />
-
+        </android.support.design.widget.TextInputLayout>
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp">
         <EditText
             android:id="@+id/editText3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="28dp"
-            android:layout_marginTop="10dp"
             android:layout_marginStart="28dp"
             android:hint="Username"
             android:inputType="textPersonName" />
+        </android.support.design.widget.TextInputLayout>
 
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp">
         <EditText
             android:id="@+id/editText4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/editText3"
             android:layout_marginEnd="28dp"
-            android:layout_marginTop="10dp"
             android:layout_marginStart="28dp"
             android:hint="Password"
             android:inputType="textPassword" />
+        </android.support.design.widget.TextInputLayout>
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp">
 
         <EditText
             android:id="@+id/editText5"
@@ -89,10 +105,10 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/editText4"
             android:layout_marginEnd="28dp"
-            android:layout_marginTop="10dp"
             android:layout_marginStart="28dp"
             android:hint="Confirm Password"
             android:inputType="textPassword" />
+        </android.support.design.widget.TextInputLayout>
 
         <Button
             android:id="@+id/button5"

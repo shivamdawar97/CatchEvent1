@@ -6,11 +6,14 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -26,6 +29,7 @@ import java.util.Objects;
 
 import dawar.catchevent.R;
 
+import static dawar.catchevent.CatchEvent.Uid;
 import static dawar.catchevent.CatchEvent.mAuth;
 import static dawar.catchevent.CatchEvent.mdatabase;
 import static dawar.catchevent.CatchEvent.userType;
@@ -55,6 +59,7 @@ public class SettingsFrag extends Fragment {
 
 
         newlv = view.findViewById(R.id.list_view);
+
         setlist = new ArrayList<>();
         keys = new ArrayList<>();
 
@@ -67,7 +72,7 @@ public class SettingsFrag extends Fragment {
         }
         setlist.add("LogOut");
         activity=getActivity();
-
+        setListViewHeightBasedOnChildren(newlv);
         newlv.setAdapter(new SettingListAdapter(activity,setlist));
         LayoutAnimationController controller
                 = AnimationUtils.loadLayoutAnimation(
@@ -76,10 +81,9 @@ public class SettingsFrag extends Fragment {
         name_view=view.findViewById(R.id.user_name_text);
         type_view=view.findViewById(R.id.user_type_text);
         user_dp=view.findViewById(R.id.imageId);
-        String uid= mAuth.getCurrentUser().getUid();
 
 
-        mdatabase.child("users").child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+        mdatabase.child("users").child(Uid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -110,16 +114,18 @@ public class SettingsFrag extends Fragment {
                 s= Objects.requireNonNull(dataSnapshot.child("image").getValue()).toString();
 
                 final String finalS = s;
-                Picasso.with(activity).load(s).networkPolicy(NetworkPolicy.OFFLINE).into(user_dp, new Callback() {
+                Picasso.get().load(s).networkPolicy(NetworkPolicy.OFFLINE).into(user_dp, new Callback() {
                     @Override
                     public void onSuccess() {
 
                     }
 
                     @Override
-                    public void onError() {
-                    Picasso.with(activity).load(finalS).into(user_dp);
+                    public void onError(Exception e) {
+                        Picasso.get().load(finalS).into(user_dp);
+
                     }
+
                 });
             }
 
@@ -131,6 +137,27 @@ public class SettingsFrag extends Fragment {
 
 
         return view;
+    }
+
+    public static void setListViewHeightBasedOnChildren(ListView listView) {
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter == null)
+            return;
+
+        int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(), View.MeasureSpec.UNSPECIFIED);
+        int totalHeight = 0;
+        View view = null;
+        for (int i = 0; i < listAdapter.getCount(); i++) {
+            view = listAdapter.getView(i, view, listView);
+            if (i == 0)
+                view.setLayoutParams(new ViewGroup.LayoutParams(desiredWidth, LinearLayout.LayoutParams.WRAP_CONTENT));
+
+            view.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
+            totalHeight += view.getMeasuredHeight();
+        }
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
     }
 
 }

@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -16,27 +17,34 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.Toast;
+import android.widget.LinearLayout.LayoutParams;
 
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import dawar.catchevent.R;
@@ -68,9 +76,11 @@ public class AddEvent extends AppCompatActivity {
         setContentView(R.layout.activity_add_event);
         Toolbar toolbar =  findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        final ScrollView scroll=findViewById(R.id.scrollView);
 
         linearLayout=findViewById(R.id.prize_linear);
-        linearLayout.setVisibility(View.GONE);
+        collapse(linearLayout);
+
         imageView=findViewById(R.id.add_event_image);
         cBox=findViewById(R.id.check_box);
        // View view=getLayoutInflater().inflate(R.layout.content_add_event,null);
@@ -105,12 +115,15 @@ public class AddEvent extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if(b){
-            linearLayout.setVisibility(View.VISIBLE);
+//            linearLayout.setVisibility(View.VISIBLE);
+                    expand(linearLayout);
+                    scroll.fullScroll(View.FOCUS_DOWN);
             t=1;
                 }
                 else {
                     t=0;
-                    linearLayout.setVisibility(View.GONE);
+//                    linearLayout.setVisibility(View.GONE);
+                    collapse(linearLayout);
                 }
             }
         });
@@ -159,58 +172,130 @@ public class AddEvent extends AppCompatActivity {
         if(filepath != null && !TextUtils.isEmpty(s2) && !TextUtils.isEmpty(s3) &&
                 !TextUtils.isEmpty(s4) && !TextUtils.isEmpty(s5) && !TextUtils.isEmpty(s9))
         {
-            StorageReference riversRef = mstorage.child("images").child(s1).child(filepath.getLastPathSegment());
+            final StorageReference ref = mstorage.child("images").child(s1).child(filepath.getLastPathSegment());
             pd.setTitle("Updating The Event Details...");
             pd.show();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
 
             final byte[] data1 = baos.toByteArray();
+            UploadTask uploadTask=ref.putBytes(data1);
 
-            riversRef.putBytes(data1).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                 @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    @SuppressWarnings("VisibleForTests") final Uri dnldurl=taskSnapshot.getDownloadUrl();
+                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                    if (!task.isSuccessful()) {
 
-                    final DatabaseReference newPost=mdatabase.child("Events").push();
-                    newPost.child("image").setValue(Objects.requireNonNull(dnldurl).toString());
-                    newPost.child("name").setValue(s1);
-                    newPost.child("date").setValue(s2);
-                    newPost.child("time").setValue(s3);
-                    newPost.child("desc").setValue(s4);
-                    newPost.child("venue").setValue(s9);
-                    newPost.child("regfee").setValue(s5);
-
-                    if(t==1) {
-                        if (!s6.equals("")) {
-                            newPost.child("fstpz").setValue(s6);
-                        }
-                        if (!s7.equals("")) {
-                            newPost.child("sndpz").setValue(s7);
-                        }
-                        if (!s8.equals("")) {
-                            newPost.child("thrdpz").setValue(s8);
-                        }
+                        throw task.getException();
                     }
 
-                    mdatabase.child("users").child(Uid).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            newPost.child("organiser").child(Uid).setValue(dataSnapshot.child("username").getValue());
+                    // Continue with the task to get the download URL
+                    return ref.getDownloadUrl();
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (task.isSuccessful()) {
+                        @SuppressWarnings("VisibleForTests") final Uri dnldurl = task.getResult();
+                        final DatabaseReference newPost = mdatabase.child("Events").push();
+                        final Map<String, String> data = new HashMap<>();
+                        data.put("image", Objects.requireNonNull(dnldurl).toString());
+                        data.put("name", s1);
+                        data.put("date", s2);
+                        data.put("time", s3);
+                        data.put("desc", s4);
+                        data.put("venue", s9);
+                        data.put("regfee", s5);
+
+                        if (t == 1) {
+                            if (!s6.equals("")) {
+                                data.put("fstpz", s6);
+                            }
+                            if (!s7.equals("")) {
+                                data.put("sndpz", s7);
+                            }
+                            if (!s8.equals("")) {
+                                data.put("thrdpz", s8);
+                            }
                         }
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
+                        mdatabase.child("users").child(Uid).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        }
-                    });
-                    mdatabase.child("users").child(Uid).child("events")
-                            .child(newPost.getKey()).setValue(s1);
-                    pd.dismiss();
-                    Toast.makeText(AddEvent.this,"Event Created",Toast.LENGTH_LONG).show();
-                    finish();
+                                newPost.setValue(data);
+                                newPost.child("organiser").child(Uid).setValue(dataSnapshot.child("username").getValue());
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+                        mdatabase.child("users").child(Uid).child("events")
+                                .child(newPost.getKey()).setValue(s1);
+
+                        Toast.makeText(AddEvent.this, "Event Created", Toast.LENGTH_LONG).show();
+                        finish();
+                    } else {
+                        // Handle failures
+                        // ...
+                        pd.dismiss();
+                        Toast.makeText(AddEvent.this, "Event creation failed", Toast.LENGTH_LONG).show();
+
+                    }
                 }
             });
+
+
+         /*   if (task.isSuccessful()){
+                @SuppressWarnings("VisibleForTests") final Uri dnldurl = riversRef.getDownloadUrl().getResult();
+                final DatabaseReference newPost = mdatabase.child("Events").push();
+                final Map<String, String> data = new HashMap<>();
+                data.put("image", Objects.requireNonNull(dnldurl).toString());
+                data.put("name", s1);
+                data.put("date", s2);
+                data.put("time", s3);
+                data.put("desc", s4);
+                data.put("venue", s9);
+                data.put("regfee", s5);
+
+                if (t == 1) {
+                    if (!s6.equals("")) {
+                        data.put("fstpz", s6);
+                    }
+                    if (!s7.equals("")) {
+                        data.put("sndpz", s7);
+                    }
+                    if (!s8.equals("")) {
+                        data.put("thrdpz", s8);
+                    }
+                }
+
+                mdatabase.child("users").child(Uid).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        newPost.setValue(data);
+                        newPost.child("organiser").child(Uid).setValue(dataSnapshot.child("username").getValue());
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+                mdatabase.child("users").child(Uid).child("events")
+                        .child(newPost.getKey()).setValue(s1);
+
+                Toast.makeText(AddEvent.this, "Event Created", Toast.LENGTH_LONG).show();
+                finish();
+            }
+            else {
+                pd.dismiss();
+                Toast.makeText(AddEvent.this, "Event creation failed", Toast.LENGTH_LONG).show();
+
+            }*/
         }
         else
         {
@@ -220,5 +305,57 @@ public class AddEvent extends AppCompatActivity {
         }
 
     }
+    public static void expand(final View v) {
+        v.measure(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        final int targetHeight = v.getMeasuredHeight();
 
+        // Older versions of android (pre API 21) cancel animations for views with a height of 0.
+        v.getLayoutParams().height = 1;
+        v.setVisibility(View.VISIBLE);
+        Animation a = new Animation()
+        {
+            @Override
+            protected void applyTransformation(float interpolatedTime, Transformation t) {
+                v.getLayoutParams().height = interpolatedTime == 1
+                        ? LayoutParams.WRAP_CONTENT
+                        : (int)(targetHeight * interpolatedTime);
+                v.requestLayout();
+            }
+
+            @Override
+            public boolean willChangeBounds() {
+                return true;
+            }
+        };
+
+        // 1dp/ms
+        a.setDuration((int)(targetHeight / v.getContext().getResources().getDisplayMetrics().density));
+        v.startAnimation(a);
+    }
+
+    public static void collapse(final View v) {
+        final int initialHeight = v.getMeasuredHeight();
+
+        Animation a = new Animation()
+        {
+            @Override
+            protected void applyTransformation(float interpolatedTime, Transformation t) {
+                if(interpolatedTime == 1){
+                    v.setVisibility(View.GONE);
+                }else{
+                    v.getLayoutParams().height = initialHeight - (int)(initialHeight * interpolatedTime);
+                    v.requestLayout();
+                }
+            }
+
+            @Override
+            public boolean willChangeBounds() {
+                return true;
+            }
+        };
+
+        // 1dp/ms
+        a.setDuration((int)(initialHeight / v.getContext().getResources().getDisplayMetrics().density));
+        v.startAnimation(a);
+    }
 }

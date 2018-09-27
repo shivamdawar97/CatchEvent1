@@ -152,7 +152,7 @@ public class AddAlerts extends AppCompatActivity {
                    @Override
                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                        @SuppressWarnings("VisibleForTests")
-                       final Uri dnldurl=taskSnapshot.getDownloadUrl();
+                       final Uri dnldurl=taskSnapshot.getUploadSessionUri();
 
                        DatabaseReference newpost1=mdatabase.child("Gallery").push();
 

@@ -2,6 +2,7 @@ package dawar.catchevent;
 
 import android.app.Application;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -19,9 +20,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
@@ -76,7 +77,6 @@ public class CatchEvent extends Application {
         mAuth=FirebaseAuth.getInstance();
 
         Picasso.Builder builder=new Picasso.Builder(this);
-        builder.downloader(new OkHttpDownloader(this,Integer.MAX_VALUE));
         Picasso built=builder.build();
         built.setIndicatorsEnabled(false);
         built.setLoggingEnabled(true);
@@ -89,7 +89,7 @@ public class CatchEvent extends Application {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 try {
-                    Uid= mAuth.getCurrentUser().getUid();
+                        Uid= mAuth.getCurrentUser().getUid();
 
                 }catch (Exception e){
                     e.printStackTrace();
@@ -97,6 +97,8 @@ public class CatchEvent extends Application {
 
             }
         });
+
+        FirebaseMessaging.getInstance().subscribeToTopic("addEvents");
 
     }
 

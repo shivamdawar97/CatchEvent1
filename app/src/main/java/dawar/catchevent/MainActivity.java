@@ -80,7 +80,6 @@ public class MainActivity extends AppCompatActivity
     RecyclerView rv;
     FirebaseUser muser;
     AlertDialog.Builder builder;
-
     Cursor cursor;
     android.support.v4.app.FragmentTransaction ft;
     ArrayList<String> titles,Events;
@@ -123,6 +122,7 @@ public class MainActivity extends AppCompatActivity
        getLoaderManager().initLoader(i,null,new LoaderCallbacks()).forceLoad();
        i++;
 
+       startService(new Intent(this,FirebaseService.class));
 
      }
 
@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity
 
          mdatabase.child("Events").addChildEventListener(new ChildEventListener() {
              @Override
-             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
               try {
 
                   s=dataSnapshot.getKey();
@@ -139,10 +139,10 @@ public class MainActivity extends AppCompatActivity
                       Bundle bundle=new Bundle();
                       bundle.putString("key",s);
 
-                      s = dataSnapshot.child("image").getValue().toString();
+                      s = Objects.requireNonNull(dataSnapshot.child("image").getValue()).toString();
                       bundle.putString("url",s);
 
-                      s=dataSnapshot.child("name").getValue().toString();
+                      s= Objects.requireNonNull(dataSnapshot.child("name").getValue()).toString();
                       bundle.putString("title",s);
 
                       getLoaderManager().initLoader(i,bundle,new FirebaseCallbacks()).forceLoad();
@@ -157,12 +157,12 @@ public class MainActivity extends AppCompatActivity
              }
 
              @Override
-             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, String s) {
 
              }
 
              @Override
-             public void onChildRemoved(DataSnapshot dataSnapshot) {
+             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
                  String s=dataSnapshot.getKey();
                  if(Events.contains(s)){
                      int i=Events.indexOf(s);
@@ -176,12 +176,12 @@ public class MainActivity extends AppCompatActivity
              }
 
              @Override
-             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+             public void onChildMoved(@NonNull DataSnapshot dataSnapshot, String s) {
 
              }
 
              @Override
-             public void onCancelled(DatabaseError databaseError) {
+             public void onCancelled(@NonNull DatabaseError databaseError) {
 
              }
          });
@@ -266,8 +266,9 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_camera) {
             // Handle the camera action
             muser = mAuth.getCurrentUser();
-            if (muser == null) {
-                Toast.makeText(MainActivity.this, "You are not Registered", Toast.LENGTH_SHORT).show();
+            getUserType();
+            if (muser == null || userType==1 ) {
+                Toast.makeText(MainActivity.this, "You are not Registered as Organiser", Toast.LENGTH_SHORT).show();
 
             } else {
                 getUserType();
@@ -380,7 +381,7 @@ public class MainActivity extends AppCompatActivity
             if(userType==2) {
                 mdatabase.child("users").child(Uid).child("events").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                             keys.add(snapshot.getKey());
                             arrayAdapter.add(Objects.requireNonNull(snapshot.getValue()).toString());
@@ -388,7 +389,7 @@ public class MainActivity extends AppCompatActivity
                         }
                     }
                     @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
                     }
                 });
@@ -397,15 +398,15 @@ public class MainActivity extends AppCompatActivity
 
                 mdatabase.child("Events").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         for(DataSnapshot snapshot: dataSnapshot.getChildren()){
                             keys.add(snapshot.getKey());
-                            arrayAdapter.add(snapshot.child("name").getValue().toString());
+                            arrayAdapter.add(Objects.requireNonNull(snapshot.child("name").getValue()).toString());
                         }
                     }
 
                     @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
                     }
                 });
@@ -461,7 +462,7 @@ public class MainActivity extends AppCompatActivity
                                 mstore[0].putBytes(data1).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                     @Override
                                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                        @SuppressWarnings("VisibleForTests") final Uri dnldurl = taskSnapshot.getDownloadUrl();
+                                        @SuppressWarnings("VisibleForTests") final Uri dnldurl = taskSnapshot.getUploadSessionUri();
                                         String s = Calendar.getInstance().getTime().toString();
                                         DatabaseReference newpost = mdatabase.child("Gallery").push();
                                         newpost.child("url").setValue(dnldurl.toString());

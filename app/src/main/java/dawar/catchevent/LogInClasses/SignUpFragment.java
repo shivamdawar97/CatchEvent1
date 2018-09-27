@@ -263,7 +263,7 @@ public class SignUpFragment extends Fragment {
         mUserStorage.putBytes(data1).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-               final Uri dnldurl=taskSnapshot.getDownloadUrl();
+               final Uri dnldurl=taskSnapshot.getUploadSessionUri();
                 mUserdata.child("image").setValue(Objects.requireNonNull(dnldurl).toString());
             }
         }).addOnFailureListener(new OnFailureListener() {
