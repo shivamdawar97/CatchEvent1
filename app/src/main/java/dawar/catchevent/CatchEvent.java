@@ -1,5 +1,6 @@
 package dawar.catchevent;
 
+import android.app.Activity;
 import android.app.Application;
 
 import android.content.BroadcastReceiver;
@@ -7,9 +8,11 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.view.Display;
 import android.widget.Toast;
 
 
@@ -45,6 +48,8 @@ public class CatchEvent extends Application {
     public static ArrayList<String> imgKeys;
     public static String Uid;
     public static int userType=1;
+    public static int width;
+    public static int height;
 
     DatabaseHelper databaseHelper;
 
@@ -99,6 +104,7 @@ public class CatchEvent extends Application {
         });
 
         FirebaseMessaging.getInstance().subscribeToTopic("addEvents");
+
 
     }
 

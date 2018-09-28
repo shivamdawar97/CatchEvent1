@@ -26,7 +26,7 @@
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".EventClasses.EventDetail"
-            android:label="@string/title_activity_event_detail" />
+            />
         <activity android:name=".GalleryAndAlertClasses.GalleryActivity" />
         <activity android:name=".SettingsClasses.SettingsActivity" />
         <activity

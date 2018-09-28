@@ -2,6 +2,7 @@ package dawar.catchevent;
 
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 
 import android.app.LoaderManager;
@@ -16,6 +17,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -33,6 +35,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -73,6 +76,8 @@ import static dawar.catchevent.CatchEvent.getUserType;
 import static dawar.catchevent.CatchEvent.mdatabase;
 import static dawar.catchevent.CatchEvent.sdatabase;
 import static dawar.catchevent.CatchEvent.userType;
+import  static dawar.catchevent.CatchEvent.height;
+import  static dawar.catchevent.CatchEvent.width;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener
@@ -84,8 +89,6 @@ public class MainActivity extends AppCompatActivity
     android.support.v4.app.FragmentTransaction ft;
     ArrayList<String> titles,Events;
     ArrayList<Bitmap> images;
-
-
     private FirebaseAuth mAuth;
     int i=0;
     RecyclerAdapter recyclerAdapter;
@@ -124,6 +127,11 @@ public class MainActivity extends AppCompatActivity
 
        startService(new Intent(this,FirebaseService.class));
 
+        Display display = getWindowManager(). getDefaultDisplay();
+        Point size = new Point();
+        display. getSize(size);
+        width= size. x;
+        height = size. y;
      }
 
      private void initiateFirebaseLoaders(){

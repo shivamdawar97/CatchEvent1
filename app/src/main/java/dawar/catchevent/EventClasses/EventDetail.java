@@ -1,12 +1,19 @@
 package dawar.catchevent.EventClasses;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -23,17 +30,21 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.Objects;
 
+import dawar.catchevent.BlurBuilder;
 import dawar.catchevent.CatchEvent;
 import dawar.catchevent.GalleryAndAlertClasses.GalleryActivity;
 import dawar.catchevent.GalleryAndAlertClasses.Image_slider;
 import dawar.catchevent.R;
 import dawar.catchevent.SettingsClasses.SettingsActivity;
+import  static dawar.catchevent.CatchEvent.height;
+import  static dawar.catchevent.CatchEvent.width;
+
 
 public class EventDetail extends AppCompatActivity {
 
     String keyID;
     DatabaseReference mdata;
-    ImageView im;
+
     FirebaseAuth mAuth;
     FirebaseUser muser;
     EditText fst,snd,thd;
@@ -41,20 +52,30 @@ public class EventDetail extends AppCompatActivity {
     int  position;
     TextView title,regfee,date,time,
              desc,venue,prizeView;
-    View layout;
     String s;
     Button b;
+    AppBarLayout layout;
+    Toolbar toolbar;
+    TextView titleTv ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_detail);
-        Toolbar toolbar =  findViewById(R.id.toolbar);
+        toolbar =  findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        layout=findViewById(R.id.detailcontent);
+
+        layout=findViewById(R.id.app_bar);
+
+        ViewGroup.LayoutParams params = layout.getLayoutParams();
+        // Changes the height and width to the specified *pixels*
+        params.height = height/2;
+        params.width = width;
+        layout.setLayoutParams(params);
+
         resultsLayout=findViewById(R.id.results_layout);
         resultsLayout.setVisibility(View.GONE);
-        im=findViewById(R.id.imageView2);
+
         mAuth=FirebaseAuth.getInstance();
         muser=mAuth.getCurrentUser();
         title=findViewById(R.id.event_title);
@@ -73,7 +94,10 @@ public class EventDetail extends AppCompatActivity {
 
         keyID=getIntent().getStringExtra("key");
         position=getIntent().getIntExtra("pos",0);
-        populate(keyID,im,position);
+        final CollapsingToolbarLayout layout1=findViewById(R.id.toolbar_layout);
+
+
+        populate(keyID,layout1,position);
 
         if(muser==null ){
             fst.setFocusable(false);
@@ -84,7 +108,7 @@ public class EventDetail extends AppCompatActivity {
 
     }
 
-    private void populate(final String keyID, final ImageView imageView, final int position) {
+    private void populate(final String keyID, final CollapsingToolbarLayout layout1, final int position) {
 
         mdata.child("Events").child(keyID).addValueEventListener(new ValueEventListener() {
             @Override
@@ -95,26 +119,67 @@ public class EventDetail extends AppCompatActivity {
                     s = dataSnapshot.child("name").getValue().toString();
                     title.setText(s);
                     android.support.v7.app.ActionBar actionBar = getSupportActionBar();
-                    actionBar.setTitle(s);
-                    actionBar.setDisplayHomeAsUpEnabled(true);
+                    if (actionBar != null) {
 
-                    imageView.setImageBitmap(((CatchEvent)EventDetail.this.getApplication()).getImageAtPos(position));
+                        actionBar.setDisplayHomeAsUpEnabled(true);
+                    }
 
-                    date.setText(" DATE :" + dataSnapshot.child("date").getValue());
-                    date.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_date_range_black_24dp, 0, 0, 0);
-                    time.setText(" Timings :" + dataSnapshot.child("time").getValue().toString());
-                   // time.setCompoundDrawablesWithIntrinsicBounds(R.drawable.iconwatch, 0, 0, 0);
-                    venue.setText("Venue:" + dataSnapshot.child("venue").getValue().toString());
-                    venue.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_place_black_24dp, 0, 0, 0);
+                    //imageView.setImageBitmap(((CatchEvent)EventDetail.this.getApplication()).getImageAtPos(position));
+                    Bitmap bitmap=((CatchEvent)EventDetail.this.getApplication()).getImageAtPos(position);
+                    BitmapDrawable drawable=new BitmapDrawable(getResources(),bitmap);
+                    layout1.setBackground(drawable);
+
+                    //Blur Drawable
+                    bitmap= BlurBuilder.blur(EventDetail.this,bitmap);
+                    drawable=new BitmapDrawable(getResources(),bitmap);
+
+                    titleTv=(TextView) getToolbarTitle();
+
+                    final BitmapDrawable finalDrawable = drawable;
+                    layout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+                        boolean isShow = true;
+                        int scrollRange = -1;
+
+                        Animation animation1 = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
+                        @Override
+                        public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                            if (scrollRange == -1) {
+                                scrollRange = appBarLayout.getTotalScrollRange();
+                            }
+                            if (scrollRange + verticalOffset == 0) {
+
+                                toolbar.setBackground(finalDrawable);
+                                titleTv.setText(s);
+                               // layout1.setTitle(s);
+                                isShow = true;
+                            } else if(isShow) {
+                                toolbar.setBackground(null);
+                                titleTv.setText(" ");
+                                //carefull there should a space between double quote otherwise it wont work
+                                layout1.setTitle(" ");
+                                isShow = false;
+                            }
+                        }
+                    });
+
+                    layout1.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            enlargeIt(layout1);
+                        }
+                    });
+
+                    date.setText( "\t"+dataSnapshot.child("date").getValue().toString());
+                    time.setText( dataSnapshot.child("time").getValue().toString());
+                    venue.setText( dataSnapshot.child("venue").getValue().toString());
                     desc.setText(Objects.requireNonNull(dataSnapshot.child("desc").getValue()).toString());
                     String newtext;
 
                         newtext = Objects.requireNonNull(dataSnapshot.child("regfee").getValue()).toString();
-                        regfee.setText("₹ "+newtext);
+                        regfee.setText(newtext);
 
                     if (dataSnapshot.hasChild("fstpz")) {
                         prizeView.setVisibility(View.VISIBLE);
-                        prizeView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.icon_medal,0,0,0);
                         newtext = Objects.requireNonNull(dataSnapshot.child("fstpz").getValue()).toString();
                         prizeView.setText(" First:" + newtext);
                     }
@@ -234,5 +299,17 @@ public class EventDetail extends AppCompatActivity {
             mdata.child("Events").child(keyID).child("rs_snd").setValue(s2);
             mdata.child("Events").child(keyID).child("rs_thd").setValue(s3);
         }
+    }
+
+    private View getToolbarTitle() {
+        int childCount = toolbar.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View child = toolbar.getChildAt(i);
+            if (child instanceof TextView) {
+                return child;
+            }
+        }
+
+        return new View(this);
     }
 }
